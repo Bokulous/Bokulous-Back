@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bokulous-Back", "Bokulous-Back\Bokulous-Back.csproj", "{C3F9A09C-1A13-4751-9608-6E3DC617FAC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bokulous-BackTests", "Bokulous-BackTests\Bokulous-BackTests.csproj", "{0443F32D-30A1-45AE-A35F-7F1EA854C6E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C3F9A09C-1A13-4751-9608-6E3DC617FAC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3F9A09C-1A13-4751-9608-6E3DC617FAC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3F9A09C-1A13-4751-9608-6E3DC617FAC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0443F32D-30A1-45AE-A35F-7F1EA854C6E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0443F32D-30A1-45AE-A35F-7F1EA854C6E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0443F32D-30A1-45AE-A35F-7F1EA854C6E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0443F32D-30A1-45AE-A35F-7F1EA854C6E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
