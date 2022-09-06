@@ -13,7 +13,7 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public void TestMethodTest()
         {
-            Assert.True(false, "This test needs an implementati");
+            Assert.True(false, "This test needs an implementat");
         }
     }
 }
