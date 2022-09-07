@@ -1,6 +1,14 @@
+using Bokulous_Back.Models;
+using Bokulous_Back.MongoDb;
+using Bokulous_Back.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<BooksDatabaseSettings>(
+    builder.Configuration.GetSection("BokulousDatabase"));
+
+builder.Services.AddSingleton<BooksService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -21,5 +29,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+var db = new DbConnect();
+db.Connect();
 
 app.Run();
