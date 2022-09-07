@@ -1,0 +1,58 @@
+USER
+
+guid Id
+string Mail
+string Username
+string Password
+bool isActive
+bool isBlocked
+Order[] Previous_Orders	
+bool isAdmin
+bool isSeller
+
+BOOKS
+
+int ISBN
+string title
+string[] categories
+string language
+string[] authors
+Date published
+int weight
+bool isUsed
+int inStorage
+double price
+BookUser seller {
+	guid id
+	string Mail
+	string Username
+}
+
+ORDERS
+
+guid Id
+Date date
+OrderBook {
+	int isbn
+	string title
+	string[] categories
+	string language
+	string authors
+	Date published
+	bool isUsed
+	double price
+	OrderUser seller {
+		guid id
+		string Mail
+		string Username	
+	}
+	OrderUser buyer {
+		guid id
+		string Mail
+		string Username	
+	}
+	string address
+	double weight
+}
+double porto
+double cost
