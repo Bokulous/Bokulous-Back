@@ -1,5 +1,4 @@
 using Bokulous_Back.Models;
-using Bokulous_Back.MongoDb;
 using Bokulous_Back.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,8 +28,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
-var db = new DbConnect();
-db.Connect();
 
 app.Run();

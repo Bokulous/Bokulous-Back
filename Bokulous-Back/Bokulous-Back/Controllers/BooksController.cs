@@ -13,33 +13,31 @@ public class BooksController : ControllerBase
     public BooksController(BooksService booksService) =>
         _booksService = booksService;
 
-    [HttpGet]
-    public async Task<List<Book>> Get() =>
+    [HttpGet("GetBooks")]
+    public async Task<List<Book>> GetBooks() =>
         await _booksService.GetAsync();
 
-    [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<Book>> Get(string id)
+    [HttpGet("GetBooks/{id:length(24)}")]
+    public async Task<ActionResult<Book>> GetBook(string id)
     {
         var book = await _booksService.GetAsync(id);
 
         if (book is null)
-        {
             return NotFound();
-        }
 
-        return book;
+        return Ok(book);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Post(Book newBook)
+    [HttpPost("AddBooks")]
+    public async Task<IActionResult> AddBook(Book newBook)
     {
         await _booksService.CreateAsync(newBook);
 
-        return CreatedAtAction(nameof(Get), new { id = newBook.Id }, newBook);
+        return CreatedAtAction(nameof(AddBook), new { id = newBook.Id }, newBook);
     }
 
-    [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, Book updatedBook)
+    [HttpPut("UpdateBooks/{id:length(24)}")]
+    public async Task<IActionResult> UpdateBook(string id, Book updatedBook)
     {
         var book = await _booksService.GetAsync(id);
 
@@ -52,21 +50,22 @@ public class BooksController : ControllerBase
 
         await _booksService.UpdateAsync(id, updatedBook);
 
-        return NoContent();
+        return Ok();
     }
 
-    [HttpDelete("{id:length(24)}")]
-    public async Task<IActionResult> Delete(string id)
+    [HttpPut("DeleteBook/{id:length(24)}")]
+    public async Task<IActionResult> DeleteBook(string id)
     {
         var book = await _booksService.GetAsync(id);
 
-        if (book is null)
-        {
+        if(book is null)
             return NotFound();
-        }
 
-        await _booksService.RemoveAsync(id);
+        if (book.InStorage > 0)
+            book.InStorage--;
 
-        return NoContent();
+        await _booksService.UpdateAsync(id, book);
+
+        return Ok();
     }
 }
