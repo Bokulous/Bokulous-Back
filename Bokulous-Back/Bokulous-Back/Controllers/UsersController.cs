@@ -27,6 +27,17 @@ namespace Bokulous_Back.Controllers
             return Ok(users);
         }
 
+        [HttpGet("GetUser/{id:length(24)}")]
+        public async Task<ActionResult<List<User>>> GetUser(string id)
+        {
+            var user = await _bokulousDbService.GetUserAsync(id);
+
+            if (user is null)
+                return NotFound();
+
+            return Ok(user);
+        }
+
 
         [HttpPost("AddUser")]
         public async Task<ActionResult> AddUser(User newUser)
