@@ -8,7 +8,7 @@ namespace Bokulous_Back.Services
     {
         private readonly IMongoCollection<Book> _booksCollection;
 
-        public BooksService(IOptions<BooksDatabaseSettings> bookStoreDatabaseSettings)
+        public BooksService(IOptions<UsersDatabaseSettings> bookStoreDatabaseSettings)
         {
             var mongoClient = new MongoClient(
                 bookStoreDatabaseSettings.Value.ConnectionString);
@@ -16,8 +16,7 @@ namespace Bokulous_Back.Services
             var mongoDatabase = mongoClient.GetDatabase(
                 bookStoreDatabaseSettings.Value.DatabaseName);
 
-            _booksCollection = mongoDatabase.GetCollection<Book>(
-                bookStoreDatabaseSettings.Value.BooksCollectionName);
+            _booksCollection = mongoDatabase.GetCollection<Book>("Books");
         }
 
         public async Task<List<Book>> GetAsync() =>

@@ -1,10 +1,9 @@
-﻿namespace Bokulous_Back.Models
-{
-    using Bokulous_Back.Interfaces;
-    using MongoDB.Bson;
-    using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-    public class Book : IItem
+namespace Bokulous_Back.Models
+{
+    public class UserBooks
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -20,6 +19,5 @@
         public bool IsUsed { get; set; }
         public int InStorage { get; set; }
         public double Price { get; set; }
-        public BookUser Seller { get; set; }
     }
 }
