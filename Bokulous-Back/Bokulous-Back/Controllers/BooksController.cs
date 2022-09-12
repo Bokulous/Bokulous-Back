@@ -28,7 +28,7 @@ public class BooksController : ControllerBase
         return Ok(book);
     }
 
-    [HttpPost("AddBooks")]
+    [HttpPost("AddBook")]
     public async Task<IActionResult> AddBook(Book newBook)
     {
         await _bokulousDbService.CreateBookAsync(newBook);
