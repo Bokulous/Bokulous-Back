@@ -1,10 +1,9 @@
 ﻿namespace Bokulous_Back.Models
 {
-    using Bokulous_Back.Interfaces;
     using MongoDB.Bson;
     using MongoDB.Bson.Serialization.Attributes;
 
-    public class Book : IItem
+    public class Book
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -12,14 +11,14 @@
 
         public string ISBN { get; set; } = "";
         public string Title { get; set; } = "";
-        public string[] Categories { get; set; }
+        public string[] Categories { get; set; } = null!;
         public string Language { get; set; } = "";
-        public string[] Authors { get; set; }
+        public string[] Authors { get; set; } = null!;
         public int Published { get; set; }
         public int Weight { get; set; }
         public bool IsUsed { get; set; }
         public int InStorage { get; set; }
         public double Price { get; set; }
-        public BookUser Seller { get; set; }
+        public BookUser? Seller { get; set; }
     }
 }

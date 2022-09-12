@@ -11,9 +11,9 @@ namespace Bokulous_Back.Models
 
         public string ISBN { get; set; } = "";
         public string Title { get; set; } = "";
-        public string[] Categories { get; set; }
+        public string[] Categories { get; set; } = null!;
         public string Language { get; set; } = "";
-        public string[] Authors { get; set; }
+        public string[] Authors { get; set; } = null!;
         public int Published { get; set; }
         public int Weight { get; set; }
         public bool IsUsed { get; set; }

@@ -1,5 +1,4 @@
-﻿using Bokulous_Back.Interfaces;
-using Bokulous_Back.Models;
+﻿using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Mvc;
 

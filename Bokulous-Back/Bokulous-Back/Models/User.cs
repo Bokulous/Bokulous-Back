@@ -1,21 +1,20 @@
-﻿using Bokulous_Back.Interfaces;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Bokulous_Back.Models
 {
-    public class User : IItem
+    public class User
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
-        public string Mail { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public bool isActive { get; set; }
-        public bool isBlocked { get; set; }
-        public UserBooks[] Previous_Orders { get; set; }
-        public bool isAdmin { get; set; }
-        public bool isSeller { get; set; }
+        public string Mail { get; set; } = "";
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
+        public bool IsActive { get; set; }
+        public bool IsBlocked { get; set; }
+        public UserBooks[] Previous_Orders { get; set; } = null!;
+        public bool IsAdmin { get; set; }
+        public bool IsSeller { get; set; }
     }
 }
