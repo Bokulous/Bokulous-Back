@@ -1,7 +1,19 @@
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("https://lemon-island-0af14cf03.1.azurestaticapps.net/",
+                                              "localhost");
+                      });
+});
 
 // Add services to the container.
 builder.Services.Configure<BokulousDatabaseSettings>(
@@ -22,6 +34,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseHttpsRedirection();
 
