@@ -10,8 +10,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("https://lemon-island-0af14cf03.1.azurestaticapps.net/",
-                                              "localhost");
+                          policy.AllowAnyOrigin();
                       });
 });
 
