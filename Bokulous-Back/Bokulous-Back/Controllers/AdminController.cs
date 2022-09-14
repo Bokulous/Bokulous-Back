@@ -1,4 +1,5 @@
-﻿using Bokulous_Back.Services;
+﻿using Bokulous_Back.Helpers;
+using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,41 +10,33 @@ namespace Bokulous_Back.Controllers
     public class AdminController : ControllerBase
     {
         private BokulousDbService _bokulousDbService;
+        private UserHelpers UserHelpers;
 
         public AdminController(BokulousDbService bokulousDbService)
         {
             _bokulousDbService = bokulousDbService;
+            UserHelpers = new(_bokulousDbService);
         }
 
-        //[HttpGet("GetUsers")]
-        //public async Task<ActionResult<List<User>>> GetUsers()
-        //{
-        //    var users = await _bokulousDbService.GetUserAsync();
+        [HttpPut("ChangeUserPass")]
+        public async Task<ActionResult<bool>> ChangeUserPass(string userId, string userNewPassword, string adminId, string adminPassword)
+        {
+            var user = await _bokulousDbService.GetUserAsync(userId);
 
-        //    if (users is null)
-        //        return NotFound();
+            if (!(await UserHelpers.CheckIsAdmin(adminId, adminPassword)))
+                return Forbid();
 
-        //    return Ok(users);
-        //}
+            if (user is null || user.Id is null)
+                return NotFound("User not found");
 
-        //[HttpGet("GetUser/{id:length(24)}")]
-        //public async Task<ActionResult<List<User>>> GetUser(string id)
-        //{
-        //    var user = await _bokulousDbService.GetUserAsync(id);
+            if (UserHelpers.CheckIsPasswordValid(userNewPassword))
+                return BadRequest("Invalid password");
 
-        //    if (user is null)
-        //        return NotFound();
+            user.Password = userNewPassword;
 
-        //    return Ok(user);
-        //}
+            await _bokulousDbService.UpdateUserAsync(user.Id, user);
 
-
-        //[HttpPost("AddUser")]
-        //public async Task<ActionResult> AddUser(User newUser)
-        //{
-        //    await _bokulousDbService.CreateUserAsync(newUser);
-
-        //    return Ok();
-        //}
+            return Ok(true);
+        }
     }
 }
