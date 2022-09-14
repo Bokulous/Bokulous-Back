@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Bokulous_Back.Tests
 {
-    public class TestTests
+    public class UsersTests
     {
         [Fact()]
         public void TestMethodTest()
