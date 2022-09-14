@@ -1,13 +1,10 @@
 ﻿using Xunit;
 using Bokulous_Back;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Bokulous_Back.Controllers;
 using Bokulous_Back.Services;
 using Bokulous_Back.Models;
 using System.Diagnostics;
+using Bokulous_Back.Helpers;
 
 namespace Bokulous_Back.Tests
 {
@@ -16,30 +13,20 @@ namespace Bokulous_Back.Tests
     {
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
+        private UserHelpers UserHelpers;
+        private AdminController AdminController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
-        public User? TestUser { get; set; }
 
         public AdminTests()
         {
-            var users = dbService.GetUserAsync().Result;
+            UserHelpers = new(dbService);
+            AdminController = new(dbService);
 
-            TestAdmin = users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
-            TestUser = users.FirstOrDefault(x => x.Username == "TEST_USER");
+            TestUsers = new();
 
-            if (TestAdmin is not null)
-            {
-                Debug.WriteLine("Found user: " + TestAdmin?.Username ?? "null. " + "Removing it to create it again.");
-                dbService.RemoveUserAsync(TestAdmin.Id);
-            }
-
-            if (TestAdmin is not null)
-            {
-                Debug.WriteLine("Found user: " + TestAdmin?.Username ?? "null. " + "Removing it to create it again.");
-                dbService.RemoveUserAsync(TestUser.Id);
-            }
-
-            TestAdmin = new()
+            //Test admin
+            TestUsers.Add(new User()
             {
                 IsActive = true,
                 IsAdmin = true,
@@ -49,9 +36,10 @@ namespace Bokulous_Back.Tests
                 Password = "hej123",
                 Previous_Orders = new UserBooks[0],
                 Username = "TEST_ADMIN"
-            };
+            });
 
-            TestUser = new()
+            //Test user
+            TestUsers.Add(new User()
             {
                 IsActive = true,
                 IsAdmin = false,
@@ -60,12 +48,24 @@ namespace Bokulous_Back.Tests
                 Mail = "bla2@bla.com",
                 Password = "hej123",
                 Previous_Orders = new UserBooks[0],
-                Username = "TEST_USER"
-            };
+                Username = "TEST_USER1"
+            });
 
-            dbService.CreateUserAsync(TestUser);
-            dbService.CreateUserAsync(TestAdmin);
+            //Test user
+            TestUsers.Add(new User()
+            {
+                IsActive = true,
+                IsAdmin = false,
+                IsBlocked = false,
+                IsSeller = false,
+                Mail = "bla3@bla.com",
+                Password = "hej123",
+                Previous_Orders = new UserBooks[0],
+                Username = "TEST_USER2"
+            });
 
+            //Adding test users to database
+            TestUsers.ForEach(user => dbService.CreateUserAsync(user));
         }
 
         [Fact()]
@@ -75,20 +75,63 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public void ChangeUserPassword()
+        public void CheckIsAdminTest()
         {
             var users = dbService.GetUserAsync();
-            var user = users.Result.FirstOrDefault(x => x.Username == "TEST_USER");
+            var user = users.Result.FirstOrDefault(x => x.Username == "TEST_ADMIN");
 
-            Debug.WriteLine("Found user: " + user?.Username ?? "null");
+            var expected = true;
 
-            Assert.NotNull(user);
+            var actual = UserHelpers.CheckIsAdmin(user.Id, user.Password).Result;
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public void CheckIsNotAdminTest()
+        {
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+
+            var expected = false;
+
+            var actual = UserHelpers.CheckIsAdmin(user.Id, user.Password).Result;
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public void ChangeUserPasswordTest()
+        {
+            const string NEW_PASS = "testpass123";
+
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            AdminController.ChangeUserPass(user.Id, NEW_PASS, admin.Id, admin.Password);
+
+            var expected = NEW_PASS;
+            var actual = dbService.GetUserAsync().Result.FirstOrDefault(x => x.Username == user.Username).Password;
+
+
+            Assert.Equal(expected, actual);
         }
 
         public void Dispose()
         {
-                dbService.RemoveUserAsync(TestAdmin.Id);
-                dbService.RemoveUserAsync(TestUser.Id);
+            TestUsers.ForEach(user =>
+            {
+                if (user.Username == "TEST_ADMIN")
+                {
+                    dbService.RemoveUserAsync(user.Id);
+                    TestAdmin = null;
+                    Debug.WriteLine("Removing admin: " + user?.Username);
+                }
+                else if (user.Username.Contains("TEST_"))
+                {
+                    dbService.RemoveUserAsync(user.Id);
+                    Debug.WriteLine("Removing user: " + user?.Username);
+                }
+            });
         }
     }
 }
