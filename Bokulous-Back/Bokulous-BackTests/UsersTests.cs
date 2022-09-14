@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Bokulous_Back.Tests
 {
-    public class TestTests
+    public class UsersTests
     {
         [Fact()]
         public void TestMethodTest()
         {
-            Assert.True(true, "This test needs an implementation");
+            Assert.True(true, "This test needs an implementati");
         }
     }
 }
