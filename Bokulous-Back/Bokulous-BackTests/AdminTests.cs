@@ -5,6 +5,7 @@ using Bokulous_Back.Services;
 using Bokulous_Back.Models;
 using System.Diagnostics;
 using Bokulous_Back.Helpers;
+using Newtonsoft.Json;
 
 namespace Bokulous_Back.Tests
 {
@@ -15,6 +16,7 @@ namespace Bokulous_Back.Tests
 
         private UserHelpers UserHelpers;
         private AdminController AdminController;
+        private UsersController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
 
@@ -22,6 +24,7 @@ namespace Bokulous_Back.Tests
         {
             UserHelpers = new(dbService);
             AdminController = new(dbService);
+            UsersController = new(dbService);
 
             TestUsers = new();
 
@@ -65,7 +68,9 @@ namespace Bokulous_Back.Tests
             });
 
             //Adding test users to database
-            TestUsers.ForEach(user => dbService.CreateUserAsync(user));
+            TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
+
+            TestUsers = dbService.GetUserAsync().Result;
         }
 
         [Fact()]
@@ -75,7 +80,7 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public void CheckIsAdminTest()
+        public async Task CheckIsAdminTest()
         {
             var users = dbService.GetUserAsync();
             var user = users.Result.FirstOrDefault(x => x.Username == "TEST_ADMIN");
@@ -88,7 +93,7 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public void CheckIsNotAdminTest()
+        public async Task CheckIsNotAdminTest()
         {
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
 
@@ -100,17 +105,18 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public void ChangeUserPasswordTest()
+        public async Task ChangeUserPasswordTest()
         {
             const string NEW_PASS = "testpass123";
 
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
             var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
 
-            AdminController.ChangeUserPass(user.Id, NEW_PASS, admin.Id, admin.Password);
+            await AdminController.ChangeUserPass(user.Id, NEW_PASS, admin.Id, admin.Password);
 
             var expected = NEW_PASS;
-            var actual = dbService.GetUserAsync().Result.FirstOrDefault(x => x.Username == user.Username).Password;
+            var actual = (await dbService.GetUserAsync())
+                            .FirstOrDefault(x => x.Id == user.Id).Password;
 
 
             Assert.Equal(expected, actual);
@@ -118,17 +124,17 @@ namespace Bokulous_Back.Tests
 
         public void Dispose()
         {
-            TestUsers.ForEach(user =>
+            TestUsers.ForEach(async (user) =>
             {
                 if (user.Username == "TEST_ADMIN")
                 {
-                    dbService.RemoveUserAsync(user.Id);
+                    await dbService.RemoveUserAsync(user.Id);
                     TestAdmin = null;
                     Debug.WriteLine("Removing admin: " + user?.Username);
                 }
                 else if (user.Username.Contains("TEST_"))
                 {
-                    dbService.RemoveUserAsync(user.Id);
+                    await dbService.RemoveUserAsync(user.Id);
                     Debug.WriteLine("Removing user: " + user?.Username);
                 }
             });

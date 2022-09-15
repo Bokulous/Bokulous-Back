@@ -19,7 +19,7 @@ namespace Bokulous_Back.Controllers
         }
 
         [HttpPut("ChangeUserPass")]
-        public async Task<ActionResult<bool>> ChangeUserPass(string userId, string userNewPassword, string adminId, string adminPassword)
+        public async Task<ActionResult> ChangeUserPass(string userId, string userNewPassword, string adminId, string adminPassword)
         {
             var user = await _bokulousDbService.GetUserAsync(userId);
 
@@ -29,14 +29,14 @@ namespace Bokulous_Back.Controllers
             if (user is null || user.Id is null)
                 return NotFound("User not found");
 
-            if (UserHelpers.CheckIsPasswordValid(userNewPassword))
+            if (!UserHelpers.CheckIsPasswordValid(userNewPassword))
                 return BadRequest("Invalid password");
 
             user.Password = userNewPassword;
 
             await _bokulousDbService.UpdateUserAsync(user.Id, user);
 
-            return Ok(true);
+            return Ok();
         }
     }
 }
