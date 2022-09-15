@@ -5,6 +5,7 @@ using Bokulous_Back.Services;
 using Bokulous_Back.Models;
 using System.Diagnostics;
 using Bokulous_Back.Helpers;
+using Newtonsoft.Json;
 
 namespace Bokulous_Back.Tests
 {
@@ -15,6 +16,7 @@ namespace Bokulous_Back.Tests
 
         private UserHelpers UserHelpers;
         private AdminController AdminController;
+        private UsersController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
 
@@ -22,6 +24,7 @@ namespace Bokulous_Back.Tests
         {
             UserHelpers = new(dbService);
             AdminController = new(dbService);
+            UsersController = new(dbService);
 
             TestUsers = new();
 
