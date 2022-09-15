@@ -72,39 +72,42 @@ public class BooksController : ControllerBase
     // BuyBook: Parameter- User, Book. Return- OK / Fail. Beskrivning- Om bokantal>0 och användaren inte är försäljare eller admin. Method- post.
     // ska man inte kunna vara säljare/admin OCH köpare?! - kolla att du inte kan köpa din egen bok
      [HttpPost("BuyBook")]
-    public async Task<IActionResult> BuyBook(User user, Book book)
+    public async Task<IActionResult> BuyBook(BookUser user, Book book)
     {
-        await _bokulousDbService.BuyBookAsync(book); // behövs?
+        var dbBook = await _bokulousDbService.GetBookAsync(book.Id);
 
-        if(book.Seller = user)
+        if(book.Seller == user) //???
         {
-            return NotFound; //fail?
+            return NotFound(); 
         }
 
         if (book.InStorage > 0)
         {
             book.InStorage--;
         }
+
+        await _bokulousDbService.UpdateBookAsync(book.Id, book);
             
 
-        if (book.InStorage =< 0)
+        if (book.InStorage <= 0)
         {
-            //purge book
+            await _bokulousDbService.RemoveBookAsync(book.Id);
         }
+
+        //skapa order!
             
         return Ok();
-    }+
+    }
 
 
-    // GetAuthor/ GetBooksByAuthor: Parameter- Keyword. Return- Books[]. Beskrivning- Returnerar en JSON array med lista på böcker som matchar författaren. Method- get.
-      [HttpGet("GetBooks/{id:length(24)}")]
-    public async Task<ActionResult<Book>> GetBooksByAuthor(string id)
+    // GetAuthor/ GetBooksByAuthor: Parameter- Keyword. Return- Books[]. Beskrivning- Returnerar en JSON array med lista på böcker som matchar författaren. Method- post.
+      [HttpPost("GetBooksByAuthor")]
+    public async Task<ActionResult> GetBooksByAuthor()
     {
-        //var book = await _bokulousDbService.GetBookAsync(id);
+        var book = await _bokulousDbService.GetBookAsync();
 
-        //if (book is null)
-           //return NotFound();
+        //...
 
-        //return Ok(book);
+        return Ok();
     }
 }

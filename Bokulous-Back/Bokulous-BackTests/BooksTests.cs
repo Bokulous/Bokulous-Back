@@ -15,5 +15,33 @@ namespace Bokulous_Back.Tests
         {
             Assert.True(true, "This test needs an implementati");
         }
+
+        [Fact()]
+        public void BuyBookTest_Fail()
+        {
+
+            Assert.True(true, "This test needs an implementati");
+        }
+
+        [Fact()]
+        public void BuyBookTest_Pass()
+        {
+
+            Assert.True(true, "This test needs an implementati");
+        }
+
+        [Fact()]
+        public void GetBooksByAuthor_Fail()
+        {
+
+            Assert.True(true, "This test needs an implementati");
+        }
+
+        [Fact()]
+        public void GetBooksByAuthor_Pass()
+        {
+
+            Assert.True(true, "This test needs an implementati");
+        }
     }
 }
