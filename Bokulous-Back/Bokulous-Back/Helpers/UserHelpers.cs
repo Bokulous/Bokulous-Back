@@ -19,12 +19,12 @@ namespace Bokulous_Back.Helpers
 
         public bool CheckIsPasswordValid(string password)
         {
-            const int PASS_LENGTH = 6;
+            const int PASS_MIN_LENGTH = 6;
 
             if (password is null)
                 return false;
 
-            if (password.Length < PASS_LENGTH)
+            if (password.Length < PASS_MIN_LENGTH)
                 return false;
 
             return true;
