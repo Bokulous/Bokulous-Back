@@ -1,6 +1,6 @@
 ﻿using Bokulous_Back.Models;
 using Bokulous_Back.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bokulous_Back.Controllers
@@ -58,6 +58,20 @@ namespace Bokulous_Back.Controllers
             profile.Password = null;
 
             return Ok(profile);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
+        {
+            var user = _bokulousDbService.Authenticate(userLogin);
+
+            if (user != null)
+            {
+                return Ok(user);
+            }
+
+            return NotFound("User not found");
         }
     }
 }
