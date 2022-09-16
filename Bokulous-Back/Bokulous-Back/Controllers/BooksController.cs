@@ -1,6 +1,10 @@
 ﻿using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+using Newtonsoft.Json;
+using System.Drawing;
+using System.IO;
 
 namespace BookStoreApi.Controllers;
 
@@ -53,6 +57,7 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
+
     [HttpPut("DeleteBook/{id:length(24)}")]
     public async Task<IActionResult> DeleteBook(string id)
     {
@@ -68,4 +73,44 @@ public class BooksController : ControllerBase
 
         return Ok();
     }
+
+    [HttpPut("UploadImage")]
+    public async Task<IActionResult> UploadImage(string id, string imagePath)
+    {
+        var book = await _bokulousDbService.GetBookAsync(id);
+
+        if (book is null)
+        {
+            return NotFound();
+        }
+
+        book.BookCover = System.IO.File.ReadAllBytes(imagePath);
+
+        await _bokulousDbService.UpdateBookAsync(id, book);
+
+        return Ok();
+    }
+
+    //public async Task<ActionResult<Image>> LoadImage(string id)
+    //{
+    //    var book = await _bokulousDbService.GetBookAsync(id);
+
+    //    if (book is null)
+    //    {
+    //        return NotFound();
+    //    }
+    //    if (book.BookCover == null || book.BookCover.Length == 0)
+    //    {
+    //        return NotFound("Bild saknas");
+    //    }
+
+    //    Image img;
+    //    using (MemoryStream ms = new MemoryStream(book.BookCover))
+    //    {
+    //        img = Image.FromStream(ms);
+    //        //return img;
+    //    }
+
+    //    return img;     
+    //}
 }
