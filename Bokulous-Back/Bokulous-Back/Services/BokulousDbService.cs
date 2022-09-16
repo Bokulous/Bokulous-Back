@@ -23,6 +23,19 @@ namespace Bokulous_Back.Services
             _categoriesCollection = mongoDatabase.GetCollection<Category>("Categories");
         }
 
+        public BokulousDbService(string connectionString, string dbName)
+        {
+            var mongoClient = new MongoClient(
+                connectionString);
+
+            var mongoDatabase = mongoClient.GetDatabase(
+                dbName);
+
+            _booksCollection = mongoDatabase.GetCollection<Book>("Books");
+            _usersCollection = mongoDatabase.GetCollection<User>("Users");
+            _categoriesCollection = mongoDatabase.GetCollection<Category>("Categories");
+        }
+
         //BOOKS CRUD
         public async Task<List<Book>> GetBookAsync() =>
             await _booksCollection.Find(_ => true).ToListAsync();
@@ -38,6 +51,9 @@ namespace Bokulous_Back.Services
 
         public async Task RemoveBookAsync(string id) =>
             await _booksCollection.DeleteOneAsync(x => x.Id == id);
+
+        public async Task<List<Book>> GetBooksAsyncByAuthor(string id) =>   // behöver ligga i service för att komma åt bookscollection
+            await _booksCollection.Find(x => x.Authors.Contains(id)).ToListAsync();
 
         //USERS CRUD
         public async Task<List<User>> GetUserAsync() =>

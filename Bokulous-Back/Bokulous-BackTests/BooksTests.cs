@@ -5,43 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Bokulous_Back.Services;
+using Bokulous_Back.Helpers;
+using Bokulous_Back.Models;
+using Bokulous_Back.Controllers;
+using Newtonsoft.Json;
 
 namespace Bokulous_Back.Tests
 {
     public class BooksTests
     {
-        [Fact()]
-        public void TestMethodTest()
-        {
-            Assert.True(true, "This test needs an implementati");
-        }
-
-        [Fact()]
-        public void BuyBookTest_Fail()
-        {
-
-            Assert.True(true, "This test needs an implementati");
-        }
-
-        [Fact()]
-        public void BuyBookTest_Pass()
-        {
-
-            Assert.True(true, "This test needs an implementati");
-        }
-
-        [Fact()]
-        public void GetBooksByAuthor_Fail()
-        {
-
-            Assert.True(true, "This test needs an implementati");
-        }
-
-        [Fact()]
-        public void GetBooksByAuthor_Pass()
-        {
-
-            Assert.True(true, "This test needs an implementati");
-        }
+      
     }
 }

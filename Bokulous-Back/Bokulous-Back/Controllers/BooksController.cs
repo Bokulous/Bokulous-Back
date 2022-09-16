@@ -69,45 +69,44 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
-    // BuyBook: Parameter- User, Book. Return- OK / Fail. Beskrivning- Om bokantal>0 och användaren inte är försäljare eller admin. Method- post.
-    // ska man inte kunna vara säljare/admin OCH köpare?! - kolla att du inte kan köpa din egen bok
-     [HttpPost("BuyBook")]
-    public async Task<IActionResult> BuyBook(BookUser user, Book book)
-    {
-        var dbBook = await _bokulousDbService.GetBookAsync(book.Id);
+    //// BuyBook: Parameter- User, Book. Return- OK / Fail. Beskrivning- Om bokantal>0 och användaren inte är försäljare eller admin. Method- post.
+    //// ska man inte kunna vara säljare/admin OCH köpare?! - kolla att du inte kan köpa din egen bok
+    //// bokid, userid(köpare, checka lösen på användare), sellerid
+    // [HttpPost("BuyBook/{id:length(24)}")]
+    //public async Task<IActionResult> BuyBook(BookUser user, Book book)   //error 404 i swagger, fel på databaskopplingen??? obs, på alla med id!
+    //{
+    //    book = await _bokulousDbService.GetBookAsync(id); 
 
-        if(book.Seller == user) //???
-        {
-            return NotFound(); 
-        }
+    //    if(book.Seller.Id == user.Id)
+    //    {
+    //        return NotFound(); 
+    //    }
 
-        if (book.InStorage > 0)
-        {
-            book.InStorage--;
-        }
+    //    if (book.InStorage > 0)
+    //    {
+    //        book.InStorage--;
+    //    }
 
-        await _bokulousDbService.UpdateBookAsync(book.Id, book);
+    //    await _bokulousDbService.UpdateBookAsync(book.Id, book);
             
 
-        if (book.InStorage <= 0)
-        {
-            await _bokulousDbService.RemoveBookAsync(book.Id);
-        }
+    //    if (book.InStorage <= 0)
+    //    {
+    //        await _bokulousDbService.RemoveBookAsync(book.Id);
+    //    }
 
-        //skapa order!
+    //    //skapa order! order collection(inkl model och crud) behöver skapas...
             
-        return Ok();
-    }
+    //    return Ok();
+    //}
 
 
     // GetAuthor/ GetBooksByAuthor: Parameter- Keyword. Return- Books[]. Beskrivning- Returnerar en JSON array med lista på böcker som matchar författaren. Method- post.
-      [HttpPost("GetBooksByAuthor")]
-    public async Task<ActionResult> GetBooksByAuthor()
+      [HttpPost("GetBooksByAuthor/{id:length(24)}")]
+    public async Task<ActionResult> GetBooksByAuthor(string id)
     {
-        var book = await _bokulousDbService.GetBookAsync();
+        var books = await _bokulousDbService.GetBooksAsyncByAuthor(id);
 
-        //...
-
-        return Ok();
+        return Ok(books);
     }
 }
