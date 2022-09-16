@@ -29,5 +29,18 @@ namespace Bokulous_Back.Helpers
 
             return true;
         }
+
+        public bool CheckIsUsernameValid(string username)
+        {
+            const int USERNAME_MIN_LENGTH = 3;
+
+            if (username is null)
+                return false;
+
+            if (username.Length < USERNAME_MIN_LENGTH)
+                return false;
+
+            return true;
+        }
     }
 }

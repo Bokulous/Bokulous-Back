@@ -1,4 +1,5 @@
-﻿using Bokulous_Back.Models;
+﻿using Bokulous_Back.Helpers;
+using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace Bokulous_Back.Controllers
     public class UsersController : ControllerBase
     {
         private BokulousDbService _bokulousDbService;
+        private UserHelpers userHelper;
 
         public UsersController(BokulousDbService bokulousDbService)
         {
@@ -39,9 +41,12 @@ namespace Bokulous_Back.Controllers
         }
 
 
-        [HttpPost("AddUser")]
-        public async Task<ActionResult> AddUser(User newUser)
+        [HttpPost("Register")]
+        public async Task<ActionResult> Register(User newUser)
         {
+            userHelper.CheckIsUsernameValid(newUser.Username);
+            userHelper.CheckIsPasswordValid(newUser.Password);
+
             await _bokulousDbService.CreateUserAsync(newUser);
 
             return Ok();
