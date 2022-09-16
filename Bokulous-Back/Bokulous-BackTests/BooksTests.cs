@@ -10,6 +10,7 @@ using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
 using Bokulous_Back.Controllers;
 using Newtonsoft.Json;
+using BookStoreApi.Controllers;
 
 namespace Bokulous_Back.Tests
 {
@@ -18,7 +19,7 @@ namespace Bokulous_Back.Tests
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
-        private UsersController UsersController;
+        private BooksController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
 
@@ -77,17 +78,6 @@ namespace Bokulous_Back.Tests
         public void TestMethodTest()
         {
             Assert.True(true, "This test needs an implementati");
-        }
-        public async Task ShowProfileTest()
-        {
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
-
-            user.Password = null;
-
-            var expected = user;
-            var actual = UsersController.ShowProfile(user);
-
-            Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
         }
     }
 }
