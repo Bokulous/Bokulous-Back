@@ -61,10 +61,10 @@ namespace Bokulous_Back.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
+        [HttpPost ("Login")]
+        public async Task<IActionResult> Login([FromBody] User userLogin)
         {
-            var user = _bokulousDbService.Authenticate(userLogin);
+            var user = await _bokulousDbService.Authenticate(userLogin);
 
             if (user != null)
             {
