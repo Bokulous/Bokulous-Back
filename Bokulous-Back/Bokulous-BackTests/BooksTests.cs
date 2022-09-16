@@ -11,6 +11,7 @@ using Bokulous_Back.Models;
 using Bokulous_Back.Controllers;
 using Newtonsoft.Json;
 using BookStoreApi.Controllers;
+using System.Diagnostics;
 
 namespace Bokulous_Back.Tests
 {
@@ -79,5 +80,26 @@ namespace Bokulous_Back.Tests
         {
             Assert.True(true, "This test needs an implementati");
         }
+
+        public void Dispose()
+        {
+            TestUsers = dbService.GetUserAsync().Result;
+
+            TestUsers.ForEach(async (user) =>
+            {
+                if (user.Username == "TEST_ADMIN")
+                {
+                    await dbService.RemoveUserAsync(user.Id);
+                    TestAdmin = null;
+                    Debug.WriteLine("Removing admin: " + user?.Username);
+                }
+                else if (user.Username.Contains("TEST_"))
+                {
+                    await dbService.RemoveUserAsync(user.Id);
+                    Debug.WriteLine("Removing user: " + user?.Username);
+                }
+            });
+        }
+
     }
 }

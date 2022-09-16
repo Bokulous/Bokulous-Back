@@ -124,6 +124,8 @@ namespace Bokulous_Back.Tests
 
         public void Dispose()
         {
+            TestUsers = dbService.GetUserAsync().Result;
+
             TestUsers.ForEach(async (user) =>
             {
                 if (user.Username == "TEST_ADMIN")
