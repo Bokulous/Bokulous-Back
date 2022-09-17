@@ -20,5 +20,7 @@
         public int InStorage { get; set; }
         public double Price { get; set; }
         public BookUser? Seller { get; set; }
+
+        public BsonBinaryData BookCover { get; set; } //datatyp? endast tillagd tillfälligt för att mongodb/swagger ska vara nöjda :( ta bort?
     }
 }

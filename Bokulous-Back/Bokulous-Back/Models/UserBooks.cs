@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Bokulous_Back.Models
 {
-    public class UserBooks
+    public class UserBooks // seller
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
