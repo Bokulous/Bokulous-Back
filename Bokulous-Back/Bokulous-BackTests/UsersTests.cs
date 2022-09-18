@@ -1,13 +1,5 @@
 ﻿using Xunit;
-using Bokulous_Back;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Bokulous_Back.Controllers;
-using Bokulous_Back.Helpers;
 using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -17,19 +9,18 @@ namespace Bokulous_Back.Tests
 {
     public class UsersTests
     {
-        private readonly BokulousDbService _bokulousDbService;
+        private readonly BokulousDbService _bokulousDbService = new ("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
         private readonly UsersController controller;
-        public  User userDontExist;
+        public User userDontExist;
         public UsersTests()
         {
             controller = new UsersController(_bokulousDbService);
 
             userDontExist = new User
             {
-                Id = "87367492287367",
+                Id = "123456789123456789123456",
             };
         }
-
 
         [Theory]
         [InlineData(null, "123456", StatusCodes.Status404NotFound)]
@@ -50,13 +41,13 @@ namespace Bokulous_Back.Tests
             Assert.Equal(expectedResult, statusCodeResult.StatusCode);
         }
 
-        //[Theory]
-        //[InlineData("123456", StatusCodes.Status404NotFound)]
-        //public async void ChangePasswordWhereUserIsNullReturnsStatusCode400(string password, int expectedResult)
-        //{
-        //    var actionResult = await controller.ChangePassword(userDontExist.Id, password);
-        //    var statusCodeResult = (IStatusCodeActionResult)actionResult;
-        //    Assert.Equal(expectedResult, statusCodeResult.StatusCode);
-        //}
+        [Theory]
+        [InlineData("123456", StatusCodes.Status404NotFound)]
+        public async void ChangePasswordWhereUserIsNullReturnsStatusCode400(string password, int expectedResult)
+        {
+            var actionResult = await controller.ChangePassword(userDontExist.Id, password);
+            var statusCodeResult = (IStatusCodeActionResult)actionResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
+        }
     }
 }

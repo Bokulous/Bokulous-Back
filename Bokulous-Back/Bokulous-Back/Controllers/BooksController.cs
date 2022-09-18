@@ -77,6 +77,10 @@ public class BooksController : ControllerBase
     [HttpPut("UploadImage")]
     public async Task<IActionResult> UploadImage(string id, string imagePath)
     {
+        if (string.IsNullOrEmpty(id))
+        { 
+            return NotFound(); 
+        }
         var book = await _bokulousDbService.GetBookAsync(id);
 
         if (book is null)
@@ -84,9 +88,11 @@ public class BooksController : ControllerBase
             return NotFound();
         }
 
-        book.BookCover = System.IO.File.ReadAllBytes(imagePath);
-
-        await _bokulousDbService.UpdateBookAsync(id, book);
+        if (!string.IsNullOrEmpty(imagePath))
+        {
+            book.BookCover = System.IO.File.ReadAllBytes(imagePath);
+            await _bokulousDbService.UpdateBookAsync(id, book);
+        }
 
         return Ok();
     }
