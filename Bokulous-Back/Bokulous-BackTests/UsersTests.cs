@@ -90,7 +90,14 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public void TestMethodTest()
         {
-            Assert.True(true, "This test needs an implementati");
+            //var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+
+            //user.Password = "hej123";
+
+            //var expected = user;
+            //var actual = UsersController.Login(user);
+
+            //Assert.Equal(expected, actual);
         }
 
         public void Dispose()
