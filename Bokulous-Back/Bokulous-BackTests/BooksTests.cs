@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Bokulous_Back.Services;
 using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
@@ -16,19 +18,22 @@ using System.Diagnostics;
 namespace Bokulous_Back.Tests
 {
     public class BooksTests
-    {
+    {       
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
+        private readonly BooksController BooksController;
         private UserHelpers UserHelpers;
         private BooksController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
+        
 
         public BooksTests()
         {
             UserHelpers = new(dbService);
             UsersController = new(dbService);
-
+            controller = new BooksController(dbService);
+            
             TestUsers = new();
 
             //Test admin
@@ -75,10 +80,15 @@ namespace Bokulous_Back.Tests
 
             TestUsers = dbService.GetUserAsync().Result;
         }
-        [Fact()]
-        public void TestMethodTest()
+        
+        [Theory]
+        [InlineData("", "C:\\Users\\Desktop\\image.jpg", StatusCodes.Status404NotFound)]
+        [InlineData("123456789012345678901234", "", StatusCodes.Status404NotFound)]
+        public async void UploadImageWithNoIdOrUserIsNullReturnsStatusCode404(string id, string imagePath, int expectedResult)
         {
-            Assert.True(true, "This test needs an implementati");
+            var actionResult = await BooksController.UploadImage(id, imagePath);
+            var statusCodeResult = (IStatusCodeActionResult)actionResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
         }
 
         public void Dispose()

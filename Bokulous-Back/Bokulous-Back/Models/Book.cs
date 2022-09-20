@@ -8,7 +8,6 @@
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
-
         public string ISBN { get; set; } = "";
         public string Title { get; set; } = "";
         public string[] Categories { get; set; } = null!;
@@ -20,5 +19,6 @@
         public int InStorage { get; set; }
         public double Price { get; set; }
         public BookUser? Seller { get; set; }
+        public byte[] BookCover { get; set; } 
     }
 }
