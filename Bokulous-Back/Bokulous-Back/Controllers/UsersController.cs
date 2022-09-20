@@ -59,5 +59,20 @@ namespace Bokulous_Back.Controllers
 
             return Ok(profile);
         }
+
+        // editprofile
+        //parametrar- Username, email, password,description (behövs?)
+        [HttpGet("EditProfile/{id:length(24)}")]
+        public async Task<ActionResult<User>> EditProfile(string id, User user)
+        {
+            var updatedProfile = await _bokulousDbService.UpdateUserAsync(id, user.Id);
+
+            //if (profile is null)
+            //    return NotFound();
+
+            //profile.Password = null;
+
+            return Ok(updatedProfile);
+        }
     }
 }

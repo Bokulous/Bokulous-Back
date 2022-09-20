@@ -71,7 +71,7 @@ public class BooksController : ControllerBase
 
     //// BuyBook: Parameter- User, Book. Return- OK / Fail. Beskrivning- Om bokantal>0, säljare kan inte köpa sina egna böcker. Method- post.
     [HttpPost("BuyBook/{bookId:length(24)}")]
-    public async Task<IActionResult> BuyBook(string bookId, User buyer)  
+    public async Task<IActionResult> BuyBook(string bookId, BookUser buyer)  
     {
         var book = await _bokulousDbService.GetBookAsync(bookId);
 

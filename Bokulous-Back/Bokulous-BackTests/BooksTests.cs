@@ -20,14 +20,19 @@ namespace Bokulous_Back.Tests
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
-        private BooksController UsersController;
+        private BooksController UsersController;//fel
+        //private BooksController BooksController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
+        //public List<Book?> TestBook { get; set; }
+        
 
         public BooksTests()
         {
             UserHelpers = new(dbService);
             UsersController = new(dbService);
+            //// lägg till test-bok
+            //BooksController = new(dbService);
 
             TestUsers = new();
 
@@ -70,10 +75,45 @@ namespace Bokulous_Back.Tests
                 Username = "TEST_USER2"
             });
 
+            //// test köpare (bookuser)   //påbörja, måste skapa en collection för bookusers?!?!??! 
+            //TestBuyer = new();
+            //TestBuyer.Add(new BookUser()
+            //{
+            //    //id
+            //    mail = "testbuyer@bokulous.com",
+            //    username = "TEST_BUYER!"
+            //});
+
+            ////Test book
+            //TestBook = new();
+
+            //TestBook.Add(new Book()
+            //{
+            //    // id?
+            //    ISBN = "12345",
+            //    Title= "Sagan om TEST",
+            //    Categories = new string[] {"Skräck"},
+            //    Language = "Svenska",
+            //    Authors = new string[] { "Test Testsson" },
+            //    Published = 2022,
+            //    Weight = 300,
+            //    IsUsed= false,
+            //    InStorage= 5, 
+            //    Price= 100,
+            //    //Seller  
+            //    //inget book cover
+            //}); 
+            
+
             //Adding test users to database
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
 
             TestUsers = dbService.GetUserAsync().Result;
+
+            ////lägg till test-bok till databasen
+            //TestBook.ForEach(async (book) => await dbService.CreateBookAsync(book));
+
+            //TestBook = dbService.GetBookAsync().Result;
         }
         [Fact()]
         public void TestMethodTest()
@@ -98,8 +138,41 @@ namespace Bokulous_Back.Tests
                     await dbService.RemoveUserAsync(user.Id);
                     Debug.WriteLine("Removing user: " + user?.Username);
                 }
+                // lägg till testböcker!
             });
-        }
 
-    }
+
+            //[Fact()]    // lyckas inte få till en bookuser, ger upp för nu :(
+            //void BuyBook_Pass(Book book, BookUser buyer) // testa att det går att skapa en order om alla checks går igenom -> return ok()
+            //{
+            //    //arrange
+            //      // skapa testbok
+
+            //      // skapa test-buyer(bookuser)
+
+            //    //act
+            //    var expected = ""; //return ok()
+            //    var actual = ""; //retrun ok()
+
+            //    //assert
+            //    Assert.Equal(expected, actual);
+            //}
+
+            [Fact()]
+            void GetBooksByAuthor_Pass()
+            {
+
+             //arrange
+              
+
+             //act
+                //    var expected = ""; //return ok()
+                //    var actual = ""; //retrun ok()
+
+             //assert
+                //    Assert.Equal(expected, actual);
+            }
+
+        }
+    } 
 }
