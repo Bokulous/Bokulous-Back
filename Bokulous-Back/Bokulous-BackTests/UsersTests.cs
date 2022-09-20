@@ -16,7 +16,6 @@ namespace Bokulous_Back.Tests
 {
     public class UsersTests
     {
-
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;

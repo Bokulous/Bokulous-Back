@@ -118,7 +118,6 @@ namespace Bokulous_Back.Tests
             var actual = (await dbService.GetUserAsync())
                             .FirstOrDefault(x => x.Id == user.Id).Password;
 
-
             Assert.Equal(expected, actual);
         }
 
