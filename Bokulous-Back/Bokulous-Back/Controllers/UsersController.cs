@@ -44,8 +44,11 @@ namespace Bokulous_Back.Controllers
         [HttpPost("Register")]
         public async Task<ActionResult> Register(User newUser)
         {
-            userHelper.CheckIsUsernameValid(newUser.Username);
-            userHelper.CheckIsPasswordValid(newUser.Password);
+            if (!userHelper.CheckIsUsernameValid(newUser.Username))
+                return BadRequest("Username is not valid");
+
+            if (userHelper.CheckIsPasswordValid(newUser.Password))
+                return BadRequest("Password is not valid");
 
             await _bokulousDbService.CreateUserAsync(newUser);
 

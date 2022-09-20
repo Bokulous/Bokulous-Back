@@ -93,24 +93,40 @@ namespace Bokulous_Back.Tests
 
             user.Password = "hej123";
 
-            var expected = Ok(user);
-            var actual = UsersController.Login(user);
+            var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.OkObjectResult;
 
-            Assert.Equal(expected, actual);
+            Assert.True(response.StatusCode == 200);
+        }
+        [Fact()]
+        public void LoginFailTest()
+        {
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+
+            user.Password = "hej125";
+
+            var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.NotFoundObjectResult;
+
+            Assert.False(response.StatusCode == 200);
         }
         [Fact()]
         public void RegisterTest()
         {
-            User user = new User();
+            User user = new User()
+            {
+                IsActive = true,
+                IsAdmin = false,
+                IsBlocked = false,
+                IsSeller = false,
+                Mail = "bla6@bla.com",
+                Password = "hej123",
+                Previous_Orders = new UserBooks[0],
+                Username = "TEST_USER3"
+            };
+            TestUsers.Add(user);
+            
+            var response = UsersController.Register(user).Result as Microsoft.AspNetCore.Mvc.OkResult;
 
-            user.Mail = "bla4@bla.com";
-            user.Username = "TEST_USER3";
-            user.Password = "hej123";
-
-            var expected = ;
-            var actual = UsersController.Register(user);
-
-            Assert.Equal(expected, actual);
+            Assert.True(response.StatusCode == 200);
         }
 
         public void Dispose()
