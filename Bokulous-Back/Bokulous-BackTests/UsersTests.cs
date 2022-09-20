@@ -24,6 +24,7 @@ namespace Bokulous_Back.Tests
         private UsersController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
+        public User UserDontExist;
 
         public UsersTests()
         {
@@ -75,6 +76,11 @@ namespace Bokulous_Back.Tests
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
 
             TestUsers = dbService.GetUserAsync().Result;
+
+            UserDontExist = new User
+            {
+                Id = "123456789123456789123456",
+            };
         }
         public async Task ShowProfileTest()
         {
