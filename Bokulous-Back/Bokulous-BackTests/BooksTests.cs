@@ -20,8 +20,8 @@ namespace Bokulous_Back.Tests
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
-        private BooksController UsersController;//fel
-        //private BooksController BooksController;
+        private BooksController BooksController;
+        private UsersController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
         //public List<Book?> TestBook { get; set; }
@@ -34,6 +34,7 @@ namespace Bokulous_Back.Tests
             //// lägg till test-bok
             //BooksController = new(dbService);
 
+            BooksController = new(dbService);
             TestUsers = new();
 
             //Test admin
