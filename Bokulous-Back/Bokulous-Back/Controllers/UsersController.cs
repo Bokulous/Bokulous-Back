@@ -1,4 +1,5 @@
-﻿using Bokulous_Back.Models;
+﻿using Bokulous_Back.Helpers;
+using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +44,31 @@ namespace Bokulous_Back.Controllers
         public async Task<ActionResult> AddUser(User newUser)
         {
             await _bokulousDbService.CreateUserAsync(newUser);
+
+            return Ok();
+        }
+
+        [HttpPost("ChangePassword")]
+        public async Task<IActionResult> ChangePassword(string id, string newPassword)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound("User not found");
+            }
+            if (!UserHelpers.CheckIsPasswordValid(newPassword))
+            {
+                return BadRequest("Invalid password");
+            }
+
+            var user = await _bokulousDbService.GetUserAsync(id);
+            if (user is null)
+            {
+                return NotFound("User not found");
+            }
+
+            user.Password = newPassword;
+
+            await _bokulousDbService.UpdateUserAsync(user.Id, user);
 
             return Ok();
         }
