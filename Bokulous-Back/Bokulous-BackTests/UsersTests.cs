@@ -11,6 +11,8 @@ using Bokulous_Back.Helpers;
 using Bokulous_Back.Controllers;
 using Bokulous_Back.Models;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Bokulous_Back.Tests
 {
@@ -86,10 +88,32 @@ namespace Bokulous_Back.Tests
             Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
         }
 
-        [Fact()]
-        public void TestMethodTest()
+        [Theory]
+        [InlineData(null, "123456", StatusCodes.Status404NotFound)]
+        [InlineData("", "123456", StatusCodes.Status404NotFound)]
+        public async void ChangePasswordWithEmptyOrNoIdReturnsStatusCode404(string id, string password, int expectedResult)
         {
-            Assert.True(true, "This test needs an implementati");
+            var actionResult = await UsersController.ChangePassword(id, password);
+            var statusCodeResult = (IStatusCodeActionResult)actionResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("98374920347019273", "123", StatusCodes.Status400BadRequest)]
+        public async void ChangePasswordWithInvalidPasswordReturnsStatusCode400(string id, string password, int expectedResult)
+        {
+            var actionResult = await UsersController.ChangePassword(id, password);
+            var statusCodeResult = (IStatusCodeActionResult)actionResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("123456", StatusCodes.Status404NotFound)]
+        public async void ChangePasswordWhereUserIsNullReturnsStatusCode400(string password, int expectedResult)
+        {
+            var actionResult = await UsersController.ChangePassword(UserDontExist.Id, password);
+            var statusCodeResult = (IStatusCodeActionResult)actionResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
         }
 
         public void Dispose()
