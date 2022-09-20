@@ -88,16 +88,30 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public void TestMethodTest()
+        public void LoginTest()
         {
-            //var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
 
-            //user.Password = "hej123";
+            user.Password = "hej123";
 
-            //var expected = user;
-            //var actual = UsersController.Login(user);
+            var expected = Ok(user);
+            var actual = UsersController.Login(user);
 
-            //Assert.Equal(expected, actual);
+            Assert.Equal(expected, actual);
+        }
+        [Fact()]
+        public void RegisterTest()
+        {
+            User user = new User();
+
+            user.Mail = "bla4@bla.com";
+            user.Username = "TEST_USER3";
+            user.Password = "hej123";
+
+            var expected = ;
+            var actual = UsersController.Register(user);
+
+            Assert.Equal(expected, actual);
         }
 
         public void Dispose()
