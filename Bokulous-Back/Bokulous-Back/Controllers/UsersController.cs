@@ -11,10 +11,11 @@ namespace Bokulous_Back.Controllers
     public class UsersController : ControllerBase
     {
         private BokulousDbService _bokulousDbService;
-
+        private UserHelpers UserHelpers;
         public UsersController(BokulousDbService bokulousDbService)
         {
             _bokulousDbService = bokulousDbService;
+            UserHelpers = new(_bokulousDbService);
         }
 
         [HttpGet("GetUsers")]
