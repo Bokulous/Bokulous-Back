@@ -12,6 +12,8 @@ using Bokulous_Back.Controllers;
 using Newtonsoft.Json;
 using BookStoreApi.Controllers;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Bokulous_Back.Tests
 {
@@ -76,10 +78,15 @@ namespace Bokulous_Back.Tests
 
             TestUsers = dbService.GetUserAsync().Result;
         }
-        [Fact()]
-        public void TestMethodTest()
+
+        [Theory]
+        [InlineData("", "C:\\Users\\Desktop\\image.jpg", StatusCodes.Status404NotFound)]
+        [InlineData("123456789012345678901234", "", StatusCodes.Status404NotFound)]
+        public async void UploadImageWithNoIdOrUserIsNullReturnsStatusCode404(string id, string imagePath, int expectedResult)
         {
-            Assert.True(true, "This test needs an implementati");
+            var actionResult = await BooksController.UploadImage(id, imagePath);
+            var statusCodeResult = (IStatusCodeActionResult)actionResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
         }
 
         public void Dispose()
