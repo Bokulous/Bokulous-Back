@@ -114,4 +114,44 @@ public class BooksController : ControllerBase
 
     //    return img;     
     //}
+
+    [HttpGet("GetCategories")]
+    public async Task<ActionResult<List<Category>>> GetCategories()
+    {
+        var categories = await _bokulousDbService.GetCategoryAsync();
+        if (categories.Count == 0 || categories is null)
+            return NotFound("No categories found");
+
+        return Ok(categories);
+    }
+
+    [HttpGet("GetCategoriesByKeyword")]
+    public async Task<ActionResult<List<Category>>> GetCategoriesByKeyword(string keyword)
+    {
+        var categories = await _bokulousDbService.GetCategoryAsync();
+        if (categories.Count == 0 || categories is null)
+            return NotFound("No categories found");
+
+        var cat = categories.Where(x => x.Name.Contains(keyword)).ToList();
+
+        if (cat.Count == 0 || cat is null)
+            return NotFound("No categories mathing the name found");
+
+        return Ok(cat);
+    }
+
+    [HttpGet("GetBooksByCategory")]
+    public async Task<ActionResult<List<Category>>> GetBookByCategories(string keyword)
+    {
+        var allBooks = await _bokulousDbService.GetBookAsync();
+        if (allBooks.Count == 0 || allBooks is null)
+            return NotFound("No books found");
+
+        var books = allBooks.Where(x => x.Categories.Contains(keyword)).ToList();
+
+        if (books.Count == 0 || books is null)
+            return NotFound("No books found in that category");
+
+        return Ok(books);
+    }
 }
