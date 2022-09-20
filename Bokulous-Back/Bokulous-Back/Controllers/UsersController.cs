@@ -72,5 +72,18 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
+        
+        [HttpGet("ShowProfile/{id:length(24)}")]
+        public async Task<ActionResult<User>> ShowProfile(User user)
+        {
+            var profile = await _bokulousDbService.GetUserAsync(user.Id);
+
+            if (profile is null)
+                return NotFound();
+
+            profile.Password = null;
+
+            return Ok(profile);
+        }
     }
 }

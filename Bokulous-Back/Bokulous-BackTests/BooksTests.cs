@@ -5,33 +5,111 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bokulous_Back.Controllers;
-using Bokulous_Back.Services;
-using BookStoreApi.Controllers;
-using Bokulous_Back.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Bokulous_Back.Services;
+using Bokulous_Back.Helpers;
+using Bokulous_Back.Models;
+using Bokulous_Back.Controllers;
+using Newtonsoft.Json;
+using BookStoreApi.Controllers;
+using System.Diagnostics;
 
 namespace Bokulous_Back.Tests
 {
     public class BooksTests
-    {
-        private readonly BokulousDbService _bokulousDbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
-        private readonly BooksController controller;
+    {       
+        BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
+
+        private readonly BooksController BooksController;
+        private UserHelpers UserHelpers;
+        private BooksController UsersController;
+        public List<User?> TestUsers { get; set; }
+        public User? TestAdmin { get; set; }
+        
 
         public BooksTests()
         {
-            controller = new BooksController(_bokulousDbService);
-        }
+            UserHelpers = new(dbService);
+            UsersController = new(dbService);
+            controller = new BooksController(dbService);
+            
+            TestUsers = new();
 
+            //Test admin
+            TestUsers.Add(new User()
+            {
+                IsActive = true,
+                IsAdmin = true,
+                IsBlocked = false,
+                IsSeller = false,
+                Mail = "bla1@bla.com",
+                Password = "hej123",
+                Previous_Orders = new UserBooks[0],
+                Username = "TEST_ADMIN"
+            });
+
+            //Test user
+            TestUsers.Add(new User()
+            {
+                IsActive = true,
+                IsAdmin = false,
+                IsBlocked = false,
+                IsSeller = false,
+                Mail = "bla2@bla.com",
+                Password = "hej123",
+                Previous_Orders = new UserBooks[0],
+                Username = "TEST_USER1"
+            });
+
+            //Test user
+            TestUsers.Add(new User()
+            {
+                IsActive = true,
+                IsAdmin = false,
+                IsBlocked = false,
+                IsSeller = false,
+                Mail = "bla3@bla.com",
+                Password = "hej123",
+                Previous_Orders = new UserBooks[0],
+                Username = "TEST_USER2"
+            });
+
+            //Adding test users to database
+            TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
+
+            TestUsers = dbService.GetUserAsync().Result;
+        }
+        
         [Theory]
         [InlineData("", "C:\\Users\\Desktop\\image.jpg", StatusCodes.Status404NotFound)]
         [InlineData("123456789012345678901234", "", StatusCodes.Status404NotFound)]
         public async void UploadImageWithNoIdOrUserIsNullReturnsStatusCode404(string id, string imagePath, int expectedResult)
         {
-            var actionResult = await controller.UploadImage(id, imagePath);
+            var actionResult = await BooksController.UploadImage(id, imagePath);
             var statusCodeResult = (IStatusCodeActionResult)actionResult;
             Assert.Equal(expectedResult, statusCodeResult.StatusCode);
         }
+
+        public void Dispose()
+        {
+            TestUsers = dbService.GetUserAsync().Result;
+
+            TestUsers.ForEach(async (user) =>
+            {
+                if (user.Username == "TEST_ADMIN")
+                {
+                    await dbService.RemoveUserAsync(user.Id);
+                    TestAdmin = null;
+                    Debug.WriteLine("Removing admin: " + user?.Username);
+                }
+                else if (user.Username.Contains("TEST_"))
+                {
+                    await dbService.RemoveUserAsync(user.Id);
+                    Debug.WriteLine("Removing user: " + user?.Username);
+                }
+            });
+        }
+
     }
 }
