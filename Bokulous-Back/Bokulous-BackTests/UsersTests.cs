@@ -11,6 +11,8 @@ using Bokulous_Back.Helpers;
 using Bokulous_Back.Controllers;
 using Bokulous_Back.Models;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Bokulous_Back.Tests
 {
@@ -22,6 +24,7 @@ namespace Bokulous_Back.Tests
         private UsersController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
+        public User UserDontExist;
 
         public UsersTests()
         {
@@ -73,6 +76,11 @@ namespace Bokulous_Back.Tests
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
 
             TestUsers = dbService.GetUserAsync().Result;
+
+            UserDontExist = new User
+            {
+                Id = "123456789123456789123456",
+            };
         }
         public async Task ShowProfileTest()
         {
@@ -85,6 +93,33 @@ namespace Bokulous_Back.Tests
 
             Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
         }
+
+        [Theory]
+        [InlineData(null, "123456", StatusCodes.Status404NotFound)]
+        [InlineData("", "123456", StatusCodes.Status404NotFound)]
+        public async void ChangePasswordWithEmptyOrNoIdReturnsStatusCode404(string id, string password, int expectedResult)
+        {
+            var actionResult = await UsersController.ChangePassword(id, password);
+            var statusCodeResult = (IStatusCodeActionResult)actionResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("98374920347019273", "123", StatusCodes.Status400BadRequest)]
+        public async void ChangePasswordWithInvalidPasswordReturnsStatusCode400(string id, string password, int expectedResult)
+        {
+            var actionResult = await UsersController.ChangePassword(id, password);
+            var statusCodeResult = (IStatusCodeActionResult)actionResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("123456", StatusCodes.Status404NotFound)]
+        public async void ChangePasswordWhereUserIsNullReturnsStatusCode400(string password, int expectedResult)
+        {
+            var actionResult = await UsersController.ChangePassword(UserDontExist.Id, password);
+            var statusCodeResult = (IStatusCodeActionResult)actionResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
 
         [Fact()]
         public void LoginTest()
