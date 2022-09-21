@@ -98,7 +98,7 @@ namespace Bokulous_Back.Tests
             Assert.True(response.StatusCode == 200);
         }
         [Fact()]
-        public void LoginFailTest()
+        public void LoginWrongPasswordTest()
         {
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
 
@@ -118,13 +118,13 @@ namespace Bokulous_Back.Tests
                 IsBlocked = false,
                 IsSeller = false,
                 Mail = "bla6@bla.com",
-                Password = "hej123",
+                Password = "hej1234",
                 Previous_Orders = new UserBooks[0],
                 Username = "TEST_USER3"
             };
             TestUsers.Add(user);
             
-            var response = UsersController.Register(user).Result as Microsoft.AspNetCore.Mvc.OkResult;
+            var response = UsersController.Register(user).Result as Microsoft.AspNetCore.Mvc.StatusCodeResult;
 
             Assert.True(response.StatusCode == 200);
         }

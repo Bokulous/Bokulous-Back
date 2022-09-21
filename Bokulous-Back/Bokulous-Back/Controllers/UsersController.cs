@@ -16,6 +16,7 @@ namespace Bokulous_Back.Controllers
         public UsersController(BokulousDbService bokulousDbService)
         {
             _bokulousDbService = bokulousDbService;
+            userHelper = new (_bokulousDbService);
         }
 
         [HttpGet("GetUsers")]
@@ -47,7 +48,7 @@ namespace Bokulous_Back.Controllers
             if (!userHelper.CheckIsUsernameValid(newUser.Username))
                 return BadRequest("Username is not valid");
 
-            if (userHelper.CheckIsPasswordValid(newUser.Password))
+            if (!userHelper.CheckIsPasswordValid(newUser.Password))
                 return BadRequest("Password is not valid");
 
             await _bokulousDbService.CreateUserAsync(newUser);

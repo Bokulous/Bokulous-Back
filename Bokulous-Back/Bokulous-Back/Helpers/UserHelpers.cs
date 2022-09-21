@@ -20,7 +20,7 @@ namespace Bokulous_Back.Helpers
         public bool CheckIsPasswordValid(string password)
         {
             const int PASS_MIN_LENGTH = 6;
-
+                
             if (password is null)
                 return false;
 
