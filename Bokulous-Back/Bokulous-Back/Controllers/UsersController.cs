@@ -73,7 +73,7 @@ namespace Bokulous_Back.Controllers
         [HttpPost ("Login")]
         public async Task<IActionResult> Login([FromBody] User userLogin)
         {
-            var user = await _bokulousDbService.Authenticate(userLogin);
+            var user = await _bokulousDbService.LoginAsync(userLogin);
 
             if (user != null)
             {
