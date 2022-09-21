@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Bokulous_Back.Tests
 {
+    [Collection("Sequential")]
     public class BooksTests : IDisposable
     {
         private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
@@ -80,6 +81,8 @@ namespace Bokulous_Back.Tests
             });
 
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
+            Thread.Sleep(1000);
+            TestUsers = dbService.GetUserAsync().Result;
             TestUsers = dbService.GetUserAsync().Result;
 
             TestBooks.ForEach(async (book) => await dbService.CreateBookAsync(book));

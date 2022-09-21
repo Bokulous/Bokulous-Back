@@ -7,9 +7,11 @@ using Xunit;
 
 namespace Bokulous_Back.Tests
 {
+    [Collection("Sequential")]
     public class AdminTests : IDisposable
     {
-        private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
+        
+        BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
         private AdminController AdminController;
@@ -66,7 +68,7 @@ namespace Bokulous_Back.Tests
 
             //Adding test users to database
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-
+            Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
         }
 

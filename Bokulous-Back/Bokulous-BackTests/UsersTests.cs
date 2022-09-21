@@ -8,7 +8,8 @@ using Xunit;
 
 namespace Bokulous_Back.Tests
 {
-    public class UsersTests
+    [Collection("Sequential")]
+    public class UsersTests : IDisposable
     {
         private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
@@ -65,20 +66,69 @@ namespace Bokulous_Back.Tests
 
             //Adding test users to database
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-
+            Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
         }
 
+        [Fact()]
         public async Task ShowProfileTest()
         {
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
 
-            user.Password = null;
+            user.Password = "";
+
+            var result = (await UsersController.ShowProfile(user)).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
 
             var expected = user;
-            var actual = UsersController.ShowProfile(user);
+            var actual = result.Value;
 
             Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
+        }
+
+        //FEL VID MERGE?
+
+        //[Fact()]
+        //public void LoginTest()
+        //{
+        //    var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+
+        //    user.Password = "hej123";
+
+        //    var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.OkObjectResult;
+
+        //    Assert.True(response.StatusCode == 200);
+        //}
+        //[Fact()]
+        //public void LoginWrongPasswordTest()
+        //{
+        //    var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+
+        //    user.Password = "hej125";
+
+        //    var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.NotFoundObjectResult;
+
+        //    Assert.False(response.StatusCode == 200);
+        //}
+
+        [Fact()]
+        public void RegisterTest()
+        {
+            User user = new User()
+            {
+                IsActive = true,
+                IsAdmin = false,
+                IsBlocked = false,
+                IsSeller = false,
+                Mail = "bla6@bla.com",
+                Password = "hej1234",
+                Previous_Orders = new UserBooks[0],
+                Username = "TEST_USER3"
+            };
+            TestUsers.Add(user);
+
+            var response = UsersController.Register(user).Result as Microsoft.AspNetCore.Mvc.StatusCodeResult;
+
+            Assert.True(response.StatusCode == 200);
         }
 
         [Fact()]
