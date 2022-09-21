@@ -1,6 +1,7 @@
-﻿using Bokulous_Back.Models;
+﻿using Bokulous_Back.Helpers;
+using Bokulous_Back.Models;
 using Bokulous_Back.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bokulous_Back.Controllers
@@ -10,10 +11,12 @@ namespace Bokulous_Back.Controllers
     public class UsersController : ControllerBase
     {
         private BokulousDbService _bokulousDbService;
+        private UserHelpers userHelper;
 
         public UsersController(BokulousDbService bokulousDbService)
         {
             _bokulousDbService = bokulousDbService;
+            userHelper = new (_bokulousDbService);
         }
 
         [HttpGet("GetUsers")]
@@ -39,9 +42,15 @@ namespace Bokulous_Back.Controllers
         }
 
 
-        [HttpPost("AddUser")]
-        public async Task<ActionResult> AddUser(User newUser)
+        [HttpPost("Register")]
+        public async Task<ActionResult> Register(User newUser)
         {
+            if (!userHelper.CheckIsUsernameValid(newUser.Username))
+                return BadRequest("Username is not valid");
+
+            if (!userHelper.CheckIsPasswordValid(newUser.Password))
+                return BadRequest("Password is not valid");
+
             await _bokulousDbService.CreateUserAsync(newUser);
 
             return Ok();
@@ -58,6 +67,20 @@ namespace Bokulous_Back.Controllers
             profile.Password = null;
 
             return Ok(profile);
+        }
+
+        [AllowAnonymous]
+        [HttpPost ("Login")]
+        public async Task<IActionResult> Login([FromBody] User userLogin)
+        {
+            var user = await _bokulousDbService.Authenticate(userLogin);
+
+            if (user != null)
+            {
+                return Ok(user);
+            }
+
+            return NotFound("User not found");
         }
     }
 }
