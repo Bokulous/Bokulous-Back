@@ -41,7 +41,6 @@ namespace Bokulous_Back.Controllers
             return Ok(user);
         }
 
-
         [HttpPost("Register")]
         public async Task<ActionResult> Register(User newUser)
         {
@@ -51,14 +50,19 @@ namespace Bokulous_Back.Controllers
             if (!userHelper.CheckIsPasswordValid(newUser.Password))
                 return BadRequest("Password is not valid");
 
+            await _bokulousDbService.CreateUserAsync(newUser);
+
+            return Ok();
+        }
+
         [HttpPut("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(string id, string newPassword)
+        public async Task<ActionResult> ChangePassword(string id, string newPassword)
         {
             if (string.IsNullOrEmpty(id))
             {
                 return NotFound("User not found");
             }
-            if (!UserHelpers.CheckIsPasswordValid(newPassword))
+            if (!userHelper.CheckIsPasswordValid(newPassword))
             {
                 return BadRequest("Invalid password");
             }
@@ -70,9 +74,7 @@ namespace Bokulous_Back.Controllers
             }
 
             user.Password = newPassword;
-
             await _bokulousDbService.UpdateUserAsync(user.Id, user);
-            await _bokulousDbService.CreateUserAsync(newUser);
 
             return Ok();
         }

@@ -76,20 +76,6 @@ namespace Bokulous_Back.Tests
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
             Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
-
-            //SARAH lagt till
-            testUser = new User()
-            {
-                IsActive = true,
-                IsAdmin = false,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla3@bla.com",
-                Password = "123456",
-                Previous_Orders = new UserBooks[0],
-                Username = "testUser"
-            };
-            dbService.CreateUserAsync(testUser);
         }
 
         [Fact()]
@@ -143,7 +129,6 @@ namespace Bokulous_Back.Tests
         [Theory]
         [InlineData("", StatusCodes.Status404NotFound)]
         [InlineData(null, StatusCodes.Status404NotFound)]
-
         public async void FindUsersByKeywordWhereKeywordIsNullOrEmptyReturnsStatusCode404(string keyword, object expectedResult)
         {
             var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
@@ -180,8 +165,6 @@ namespace Bokulous_Back.Tests
                     Debug.WriteLine("Removing user: " + user?.Username);
                 }
             });
-            //SARAH lagt till
-            dbService.RemoveUserAsync(testUser.Id);
         }
     }
 }
