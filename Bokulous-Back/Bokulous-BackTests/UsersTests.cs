@@ -71,14 +71,14 @@ namespace Bokulous_Back.Tests
 
             //Adding test users to database
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-
+            Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
         }
         public async Task ShowProfileTest()
         {
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
 
-            user.Password = null;
+            user.Password = "";
 
             var expected = user;
             var actual = UsersController.ShowProfile(user);

@@ -73,7 +73,7 @@ namespace Bokulous_Back.Tests
 
             //Adding test users to database
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-
+            Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
         }
         [Fact()]
