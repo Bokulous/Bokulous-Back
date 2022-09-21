@@ -56,31 +56,6 @@ namespace Bokulous_Back.Controllers
             return Ok();
         }
 
-        [HttpPost("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(string id, string newPassword)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return NotFound("User not found");
-            }
-            if (!UserHelpers.CheckIsPasswordValid(newPassword))
-            {
-                return BadRequest("Invalid password");
-            }
-
-            var user = await _bokulousDbService.GetUserAsync(id);
-            if (user is null)
-            {
-                return NotFound("User not found");
-            }
-
-            user.Password = newPassword;
-
-            await _bokulousDbService.UpdateUserAsync(user.Id, user);
-
-            return Ok();
-        }
-
         [HttpGet("ShowProfile/{id:length(24)}")]
         public async Task<ActionResult<User>> ShowProfile(User user)
         {

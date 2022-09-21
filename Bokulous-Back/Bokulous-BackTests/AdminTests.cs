@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 
 namespace Bokulous_Back.Tests
 {
+
     public class AdminTests : IDisposable
     {
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
@@ -70,6 +71,12 @@ namespace Bokulous_Back.Tests
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
             Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
+        }
+
+        [Fact()]
+        public void TestMethodTest()
+        {
+            Assert.True(true, "This test needs an implementati");
         }
 
         [Fact()]
