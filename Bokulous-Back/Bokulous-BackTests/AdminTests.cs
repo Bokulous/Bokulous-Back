@@ -6,6 +6,10 @@ using Bokulous_Back.Models;
 using System.Diagnostics;
 using Bokulous_Back.Helpers;
 using Newtonsoft.Json;
+using BookStoreApi.Controllers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace Bokulous_Back.Tests
 {
@@ -18,6 +22,7 @@ namespace Bokulous_Back.Tests
         private UsersController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
+        User testUser;
 
         public AdminTests()
         {
@@ -70,6 +75,20 @@ namespace Bokulous_Back.Tests
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
 
             TestUsers = dbService.GetUserAsync().Result;
+
+            //SARAH lagt till
+            testUser = new User()
+            {
+                IsActive = true,
+                IsAdmin = false,
+                IsBlocked = false,
+                IsSeller = false,
+                Mail = "bla3@bla.com",
+                Password = "123456",
+                Previous_Orders = new UserBooks[0],
+                Username = "testUser"
+            };
+            dbService.CreateUserAsync(testUser);
         }
 
         [Fact()]
@@ -114,6 +133,28 @@ namespace Bokulous_Back.Tests
             Assert.Equal(expected, actual);
         }
 
+        [Theory]
+        [InlineData("", StatusCodes.Status404NotFound)]
+        [InlineData(null, StatusCodes.Status404NotFound)]
+
+        public async void FindUsersByKeywordWhereKeywordIsNullOrEmptyReturnsStatusCode404(string keyword, object expectedResult)
+        {
+            var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+            var actionResult = await AdminController.FindUser(keyword, admin.Id, admin.Password);
+            var statusCodeResult = actionResult as ActionResult<List<User>>;
+            Assert.Equal(expectedResult, statusCodeResult.Value);
+        }
+
+        [Theory]
+        [InlineData(StatusCodes.Status403Forbidden)]
+        public async void FindUsersByKeywordWhereUserIsNotAdminReturnsStatusCode403(object expectedResult)
+        {
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER2");
+            var actionResult = await AdminController.FindUser("romantik", user.Id, user.Password);           
+            var statusCodeResult = actionResult as ActionResult<List<User>>;
+            Assert.Equal(expectedResult, statusCodeResult.Value);
+        }
+
         public void Dispose()
         {
             TestUsers = dbService.GetUserAsync().Result;
@@ -132,6 +173,8 @@ namespace Bokulous_Back.Tests
                     Debug.WriteLine("Removing user: " + user?.Username);
                 }
             });
+            //SARAH lagt till
+            dbService.RemoveUserAsync(testUser.Id);
         }
     }
 }

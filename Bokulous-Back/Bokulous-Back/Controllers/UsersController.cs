@@ -49,7 +49,7 @@ namespace Bokulous_Back.Controllers
             return Ok();
         }
 
-        [HttpPost("ChangePassword")]
+        [HttpPut("ChangePassword")]
         public async Task<IActionResult> ChangePassword(string id, string newPassword)
         {
             if (string.IsNullOrEmpty(id))
