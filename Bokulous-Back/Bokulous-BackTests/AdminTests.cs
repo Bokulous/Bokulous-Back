@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 
 namespace Bokulous_Back.Tests
 {
+    [Collection("Sequential")]
     public class AdminTests : IDisposable
     {
         
