@@ -12,9 +12,6 @@ using Bokulous_Back.Controllers;
 using Newtonsoft.Json;
 using BookStoreApi.Controllers;
 using System.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Bokulous_Back.Tests
 {
@@ -26,7 +23,6 @@ namespace Bokulous_Back.Tests
         private BooksController BooksController;
         private UsersController UsersController;
         public List<User?> TestUsers { get; set; }
-        public List<Category?> TestCategories;
         public User? TestAdmin { get; set; }
 
         public BooksTests()
@@ -35,7 +31,6 @@ namespace Bokulous_Back.Tests
             UsersController = new(dbService);
             BooksController = new(dbService);
             TestUsers = new();
-            TestCategories = new();
 
             //Test admin
             TestUsers.Add(new User()
@@ -75,53 +70,16 @@ namespace Bokulous_Back.Tests
                 Previous_Orders = new UserBooks[0],
                 Username = "TEST_USER2"
             });
+
             //Adding test users to database
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
+
             TestUsers = dbService.GetUserAsync().Result;
-
-            //Adding mock data for category-methods tests
-            //TestCategories.Add(new Category { Name = "test_romantik"});
-            //TestCategories.Add(new Category { Name = "test_rysare" });
-            //TestCategories.Add(new Category { Name = "test_humor" });
-            //TestCategories.Add(new Category { Name = "test_historia" });
-            //TestCategories.Add(new Category { Name = "test_skönlitteratur" });
-            //TestCategories.Add(new Category { Name = "test_litteraturvetenskap" });
-            //TestCategories.Add(new Category { Name = "test_deckare" });
-            //TestCategories.Add(new Category { Name = "test_barnbok" });
-
-            //TestCategories.ForEach(async (category) => await dbService.CreateCategoryAsync(category));
-            //TestCategories = dbService.GetCategoryAsync().Result;
         }
-
-        [Theory]
-        [InlineData("", "C:\\Users\\Desktop\\image.jpg", StatusCodes.Status404NotFound)]
-        [InlineData("123456789012345678901234", "", StatusCodes.Status404NotFound)]
-        public async void UploadImageWithNoIdOrUserIsNullReturnsStatusCode404(string id, string imagePath, int expectedResult)
+        [Fact()]
+        public void TestMethodTest()
         {
-            var actionResult = await BooksController.UploadImage(id, imagePath);
-            var statusCodeResult = (IStatusCodeActionResult)actionResult;
-            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
-        }
-
-        [Theory]
-        [InlineData("", StatusCodes.Status404NotFound)]
-        [InlineData(null, StatusCodes.Status404NotFound)]
-        public async void GetCategoriesByKeywordWhereKeywordIsNullOrEmptyReturnsStatusCode404(string keyword, int expectedResult)
-        {
-            var actionResult = await BooksController.GetCategoriesByKeyword(keyword);
-            var statusCodeResult = actionResult.Result as ObjectResult;
-            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
-        }
-
-        [Theory]
-        [InlineData("", StatusCodes.Status404NotFound)]
-        [InlineData(null, StatusCodes.Status404NotFound)]
-        [InlineData("w", StatusCodes.Status404NotFound)]
-        public async void GetBooksByCategoryWhereKeywordIsNullOrEmptyOrDontExistReturnsStatusCode404(string keyword, int expectedResult)
-        {
-            var actionResult = await BooksController.GetBooksByCategory(keyword);
-            var statusCodeResult = actionResult.Result as ObjectResult;
-            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
+            Assert.True(true, "This test needs an implementati");
         }
 
         public void Dispose()
@@ -140,17 +98,6 @@ namespace Bokulous_Back.Tests
                 {
                     await dbService.RemoveUserAsync(user.Id);
                     Debug.WriteLine("Removing user: " + user?.Username);
-                }
-            });
-
-            TestCategories = dbService.GetCategoryAsync().Result;
-
-            TestCategories.ForEach(async (category) =>
-            {
-                if (category.Name.Contains("test_"))
-                {
-                    await dbService.RemoveUserAsync(category.Id);
-                    Debug.WriteLine("Removing user: " + category?.Name);
                 }
             });
         }
