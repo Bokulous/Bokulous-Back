@@ -74,6 +74,7 @@ namespace Bokulous_Back.Tests
             Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
         }
+        /*
         [Fact()]
         public async Task ShowProfileTest()
         {
@@ -88,7 +89,7 @@ namespace Bokulous_Back.Tests
 
             Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
         }
-
+        */
         [Fact()]
         public void LoginTest()
         {
