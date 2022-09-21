@@ -74,14 +74,17 @@ namespace Bokulous_Back.Tests
             Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
         }
+        [Fact()]
         public async Task ShowProfileTest()
         {
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
 
             user.Password = "";
 
+            var result = (await UsersController.ShowProfile(user)).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+
             var expected = user;
-            var actual = UsersController.ShowProfile(user);
+            var actual = result.Value;
 
             Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
         }
