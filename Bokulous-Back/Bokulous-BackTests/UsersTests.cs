@@ -14,8 +14,9 @@ using System.Diagnostics;
 
 namespace Bokulous_Back.Tests
 {
-    public class UsersTests : IDisposable
+    public class UsersTests// : IDisposable
     {
+        /*
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
@@ -152,5 +153,6 @@ namespace Bokulous_Back.Tests
                 }
             });
         }
+        */
     }
 }
