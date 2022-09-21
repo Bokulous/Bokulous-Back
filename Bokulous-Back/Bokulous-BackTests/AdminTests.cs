@@ -9,9 +9,10 @@ using Newtonsoft.Json;
 
 namespace Bokulous_Back.Tests
 {
-
+    [Collection("Sequential")]
     public class AdminTests : IDisposable
     {
+        
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
