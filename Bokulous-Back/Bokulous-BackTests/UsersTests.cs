@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace Bokulous_Back.Tests
 {
-    public class UsersTests
+    public class UsersTests : IDisposable
     {
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
@@ -74,7 +74,7 @@ namespace Bokulous_Back.Tests
             Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
         }
-        /*
+        
         [Fact()]
         public async Task ShowProfileTest()
         {
@@ -89,7 +89,7 @@ namespace Bokulous_Back.Tests
 
             Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
         }
-        */
+        
         [Fact()]
         public void LoginTest()
         {
