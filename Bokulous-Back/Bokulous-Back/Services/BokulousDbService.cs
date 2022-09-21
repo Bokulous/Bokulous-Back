@@ -83,5 +83,17 @@ namespace Bokulous_Back.Services
 
         public async Task RemoveCategoryAsync(string id) =>
             await _categoriesCollection.DeleteOneAsync(x => x.Id == id);
+        //Login
+        public async Task<User> LoginAsync(User userLogin)
+        {
+            var currentUser = await _usersCollection.Find(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password).FirstOrDefaultAsync();
+
+            if (currentUser != null)
+            {
+                return currentUser;
+            }
+
+            return null;
+        }
     }
 }
