@@ -1,43 +1,32 @@
-﻿using Xunit;
-using Bokulous_Back;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Bokulous_Back.Services;
+﻿using Bokulous_Back.Controllers;
 using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
-using Bokulous_Back.Controllers;
-using Newtonsoft.Json;
+using Bokulous_Back.Services;
 using BookStoreApi.Controllers;
 using System.Diagnostics;
+using Xunit;
 
 namespace Bokulous_Back.Tests
 {
-    public class BooksTests
+    public class BooksTests : IDisposable
     {
-        BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
+        private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
         private BooksController BooksController;
         private UsersController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
-        //public List<Book?> TestBook { get; set; }
-        
+        public List<Book?> TestBooks { get; set; }
 
         public BooksTests()
         {
             UserHelpers = new(dbService);
             UsersController = new(dbService);
-            //// lägg till test-bok
-            //BooksController = new(dbService);
-
             BooksController = new(dbService);
             TestUsers = new();
+            TestBooks = new();
 
-            //Test admin
             TestUsers.Add(new User()
             {
                 IsActive = true,
@@ -50,7 +39,6 @@ namespace Bokulous_Back.Tests
                 Username = "TEST_ADMIN"
             });
 
-            //Test user
             TestUsers.Add(new User()
             {
                 IsActive = true,
@@ -63,7 +51,6 @@ namespace Bokulous_Back.Tests
                 Username = "TEST_USER1"
             });
 
-            //Test user
             TestUsers.Add(new User()
             {
                 IsActive = true,
@@ -76,50 +63,70 @@ namespace Bokulous_Back.Tests
                 Username = "TEST_USER2"
             });
 
-            //// test köpare (bookuser)   //påbörja, måste skapa en collection för bookusers?!?!??! 
-            //TestBuyer = new();
-            //TestBuyer.Add(new BookUser()
-            //{
-            //    //id
-            //    mail = "testbuyer@bokulous.com",
-            //    username = "TEST_BUYER!"
-            //});
+            TestBooks.Add(new Book()
+            {
+                ISBN = "12345",
+                Title = "TEST",
+                Categories = new string[] { "Skräck" },
+                Language = "Svenska",
+                Authors = new string[] { "Testy Testersson" },
+                Published = 2022,
+                Weight = 300,
+                IsUsed = false,
+                InStorage = 5,
+                Price = 100,
+                Seller = null,
+                BookCover = default
+            });
 
-            ////Test book
-            //TestBook = new();
-
-            //TestBook.Add(new Book()
-            //{
-            //    // id?
-            //    ISBN = "12345",
-            //    Title= "Sagan om TEST",
-            //    Categories = new string[] {"Skräck"},
-            //    Language = "Svenska",
-            //    Authors = new string[] { "Test Testsson" },
-            //    Published = 2022,
-            //    Weight = 300,
-            //    IsUsed= false,
-            //    InStorage= 5, 
-            //    Price= 100,
-            //    //Seller  
-            //    //inget book cover
-            //}); 
-            
-
-            //Adding test users to database
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-
             TestUsers = dbService.GetUserAsync().Result;
 
-            ////lägg till test-bok till databasen
-            //TestBook.ForEach(async (book) => await dbService.CreateBookAsync(book));
-
-            //TestBook = dbService.GetBookAsync().Result;
+            TestBooks.ForEach(async (book) => await dbService.CreateBookAsync(book));
+            TestBooks = dbService.GetBookAsync().Result;
         }
+
         [Fact()]
-        public void TestMethodTest()
+        public void BuyBook_Pass()
         {
-            Assert.True(true, "This test needs an implementati");
+            //arrange
+            var buyer = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+
+            var seller = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER2");
+
+            var book = TestBooks.FirstOrDefault(x => x.Title == "TEST");
+
+            BookUser bookUser = new()
+            {
+                Id = seller.Id,
+                Mail = seller.Mail,
+                Username = seller.Username
+            };
+            book.Seller = bookUser;
+
+            dbService.UpdateBookAsync(book.Id, book);
+
+            //act
+            var response = BooksController.BuyBook(book.Id, buyer.Id, buyer.Password).Result as Microsoft.AspNetCore.Mvc.StatusCodeResult;
+            //StatusCodeResult = hämtar statuskoden
+
+            //assert
+            Assert.True(response.StatusCode == 200);
+        }
+
+        [Fact()]
+        private void GetBooksByAuthor_Pass()
+        {
+            //arrange
+            var keyword = "Ekwurtzel";
+
+            //act
+            var response = BooksController.GetBooksByAuthor(keyword).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+            var value = response.Value as List<Book>;
+            //ObjectResult = hämtar hela objektet
+
+            //assert
+            Assert.True(value.Count > 0);
         }
 
         public void Dispose()
@@ -139,41 +146,17 @@ namespace Bokulous_Back.Tests
                     await dbService.RemoveUserAsync(user.Id);
                     Debug.WriteLine("Removing user: " + user?.Username);
                 }
-                // lägg till testböcker!
             });
 
+            TestBooks = dbService.GetBookAsync().Result;
 
-            //[Fact()]    // lyckas inte få till en bookuser, ger upp för nu :(
-            //void BuyBook_Pass(Book book, BookUser buyer) // testa att det går att skapa en order om alla checks går igenom -> return ok()
-            //{
-            //    //arrange
-            //      // skapa testbok
-
-            //      // skapa test-buyer(bookuser)
-
-            //    //act
-            //    var expected = ""; //return ok()
-            //    var actual = ""; //retrun ok()
-
-            //    //assert
-            //    Assert.Equal(expected, actual);
-            //}
-
-            [Fact()]
-            void GetBooksByAuthor_Pass()
+            TestBooks.ForEach(async (book) =>
             {
-
-             //arrange
-              
-
-             //act
-                //    var expected = ""; //return ok()
-                //    var actual = ""; //retrun ok()
-
-             //assert
-                //    Assert.Equal(expected, actual);
-            }
-
+                if (book.Title.Contains("TEST"))
+                {
+                    await dbService.RemoveBookAsync(book.Id);
+                }
+            });
         }
-    } 
+    }
 }

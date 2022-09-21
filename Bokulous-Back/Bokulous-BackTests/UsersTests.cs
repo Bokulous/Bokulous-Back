@@ -1,22 +1,16 @@
-﻿using Xunit;
-using Bokulous_Back;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Bokulous_Back.Services;
+﻿using Bokulous_Back.Controllers;
 using Bokulous_Back.Helpers;
-using Bokulous_Back.Controllers;
 using Bokulous_Back.Models;
+using Bokulous_Back.Services;
+using Newtonsoft.Json;
 using System.Diagnostics;
+using Xunit;
 
 namespace Bokulous_Back.Tests
 {
     public class UsersTests
     {
-        BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
+        private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
         private UsersController UsersController;
@@ -74,6 +68,7 @@ namespace Bokulous_Back.Tests
 
             TestUsers = dbService.GetUserAsync().Result;
         }
+
         public async Task ShowProfileTest()
         {
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
@@ -87,9 +82,22 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public void TestMethodTest()
+        public void EditProfilePass()
         {
-            Assert.True(true, "This test needs an implementati");
+            //arrange
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+
+            var password = user.Password;
+
+            user.Username = "TEST_UPDATED_USER";
+            user.Mail = "updated@mail.com";
+
+            //act
+            var response = UsersController.EditProfile(user.Id, user.Username, user.Mail, user.Password).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+            var value = response.Value as User;
+
+            //assert
+            Assert.True(value.Mail == user.Mail && value.Username == user.Username);
         }
 
         public void Dispose()
@@ -108,6 +116,15 @@ namespace Bokulous_Back.Tests
                 {
                     await dbService.RemoveUserAsync(user.Id);
                     Debug.WriteLine("Removing user: " + user?.Username);
+                }
+            });
+
+            var TestBooks = dbService.GetBookAsync().Result;
+            TestBooks.ForEach(async (book) =>
+            {
+                if (book.Title.Contains("TEST"))
+                {
+                    await dbService.RemoveBookAsync(book.Id);
                 }
             });
         }

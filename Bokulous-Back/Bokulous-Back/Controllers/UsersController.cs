@@ -1,6 +1,5 @@
 ﻿using Bokulous_Back.Models;
 using Bokulous_Back.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bokulous_Back.Controllers
@@ -38,7 +37,6 @@ namespace Bokulous_Back.Controllers
             return Ok(user);
         }
 
-
         [HttpPost("AddUser")]
         public async Task<ActionResult> AddUser(User newUser)
         {
@@ -60,19 +58,22 @@ namespace Bokulous_Back.Controllers
             return Ok(profile);
         }
 
-        // editprofile
-        //parametrar- Username, email, password,description (behövs?)
-        [HttpGet("EditProfile/{id:length(24)}")]
-        public async Task<ActionResult<User>> EditProfile(string id, User user)
+        [HttpPost("EditProfile")]
+        public async Task<ActionResult> EditProfile(string id, string username, string email, string password)
         {
-            var updatedProfile = await _bokulousDbService.UpdateUserAsync(id, user.Id);
+            var user = await _bokulousDbService.GetUserAsync(id);
 
-            //if (profile is null)
-            //    return NotFound();
+            if (user.Password == password)
+            {
+                user.Username = username;
+                user.Mail = email;
 
-            //profile.Password = null;
+                await _bokulousDbService.UpdateUserAsync(user.Id, user);
 
-            return Ok(updatedProfile);
+                return Ok(user);
+            }
+
+            return Forbid("Wrong password");
         }
     }
 }

@@ -9,7 +9,6 @@ namespace Bokulous_Back.Services
         private readonly IMongoCollection<Book> _booksCollection;
         private readonly IMongoCollection<User> _usersCollection;
         private readonly IMongoCollection<Category> _categoriesCollection;
-        private readonly IMongoCollection<Order> _ordersCollection;
 
         public BokulousDbService(IOptions<BokulousDatabaseSettings> bokulousDatabaseSettings)
         {
@@ -22,7 +21,6 @@ namespace Bokulous_Back.Services
             _booksCollection = mongoDatabase.GetCollection<Book>("Books");
             _usersCollection = mongoDatabase.GetCollection<User>("Users");
             _categoriesCollection = mongoDatabase.GetCollection<Category>("Categories");
-            _ordersCollection = mongoDatabase.GetCollection<Order>("Orders");
         }
 
         public BokulousDbService(string connectionString, string dbName)
@@ -36,7 +34,6 @@ namespace Bokulous_Back.Services
             _booksCollection = mongoDatabase.GetCollection<Book>("Books");
             _usersCollection = mongoDatabase.GetCollection<User>("Users");
             _categoriesCollection = mongoDatabase.GetCollection<Category>("Categories");
-            _ordersCollection = mongoDatabase.GetCollection<Order>("Orders");
         }
 
         //BOOKS CRUD
@@ -55,8 +52,8 @@ namespace Bokulous_Back.Services
         public async Task RemoveBookAsync(string id) =>
             await _booksCollection.DeleteOneAsync(x => x.Id == id);
 
-        public async Task<List<Book>> GetBooksAsyncByAuthor(string id) =>   // behöver ligga i service för att komma åt bookscollection
-            await _booksCollection.Find(x => x.Authors.Contains(id)).ToListAsync();
+        public async Task<List<Book>> GetBooksAsyncByAuthor(string keyword) =>   // behöver ligga i service för att komma åt bookscollection
+            await _booksCollection.Find(x => x.Authors.Any(y => y.Contains(keyword))).ToListAsync();
 
         //USERS CRUD
         public async Task<List<User>> GetUserAsync() =>
@@ -89,21 +86,5 @@ namespace Bokulous_Back.Services
 
         public async Task RemoveCategoryAsync(string id) =>
             await _categoriesCollection.DeleteOneAsync(x => x.Id == id);
-
-        // ORDERS CRUD
-        public async Task<List<Order>> GetOrderAsync() =>
-            await _ordersCollection.Find(_ => true).ToListAsync();
-
-        public async Task<Order?> GetOrderAsync(string id) =>
-            await _ordersCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
-
-        public async Task CreateOrderAsync(Order newOrder) =>
-            await _ordersCollection.InsertOneAsync(newOrder);
-
-        public async Task UpdateOrderAsync(string id, Order updatedOrder) =>
-            await _ordersCollection.ReplaceOneAsync(x => x.Id == id, updatedOrder);
-
-        public async Task RemoveOrderAsync(string id) =>
-            await _ordersCollection.DeleteOneAsync(x => x.Id == id);
     }
 }

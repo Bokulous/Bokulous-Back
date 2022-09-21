@@ -1,6 +1,6 @@
 ﻿namespace Bokulous_Back.Models
 {
-    public class BookUser // buyer
+    public class BookUser
     {
         public string? Id { get; set; }
 

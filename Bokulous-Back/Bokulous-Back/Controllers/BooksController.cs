@@ -17,7 +17,7 @@ public class BooksController : ControllerBase
     public async Task<List<Book>> GetBooks() =>
         await _bokulousDbService.GetBookAsync();
 
-    [HttpGet("GetBooks/{id:length(24)}")]
+    [HttpGet("GetBook/{id:length(24)}")]
     public async Task<ActionResult<Book>> GetBook(string id)
     {
         var book = await _bokulousDbService.GetBookAsync(id);
@@ -31,7 +31,17 @@ public class BooksController : ControllerBase
     [HttpPost("AddBook")]
     public async Task<IActionResult> AddBook(Book newBook)
     {
-        await _bokulousDbService.CreateBookAsync(newBook);
+        var books = await _bokulousDbService.GetBookAsync();
+        var book = books.FirstOrDefault(x => x.ISBN == newBook.ISBN && x.Seller == newBook.Seller);
+        if (book is null)
+        {
+            await _bokulousDbService.CreateBookAsync(newBook);
+        }
+        else
+        {
+            book.InStorage++;
+            await _bokulousDbService.UpdateBookAsync(book.Id, book);
+        }
 
         return CreatedAtAction(nameof(AddBook), new { id = newBook.Id }, newBook);
     }
@@ -58,7 +68,7 @@ public class BooksController : ControllerBase
     {
         var book = await _bokulousDbService.GetBookAsync(id);
 
-        if(book is null)
+        if (book is null)
             return NotFound();
 
         if (book.InStorage > 0)
@@ -69,60 +79,40 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
-    //// BuyBook: Parameter- User, Book. Return- OK / Fail. Beskrivning- Om bokantal>0, säljare kan inte köpa sina egna böcker. Method- post.
     [HttpPost("BuyBook/{bookId:length(24)}")]
-    public async Task<IActionResult> BuyBook(string bookId, BookUser buyer)  
+    public async Task<IActionResult> BuyBook(string bookId, string buyerId, string password)
     {
         var book = await _bokulousDbService.GetBookAsync(bookId);
+        var buyer = await _bokulousDbService.GetUserAsync(buyerId);
 
-        if (book.Seller.Id == buyer.Id)
-        {
+        if (buyer is null)
+            return NotFound("Buyer not found");
+
+        if (book is null)
+            return NotFound("Book not found");
+
+        if (buyer.Password != password)
+            return Forbid("Big nono");
+
+        if (book.Seller.Id == buyerId)
             return BadRequest("Seller = Buyer");
-        }
 
-        if (Request.Headers.TryGetValue("token", out var t)) // kollar om det finns en säkerhets-token -> user är authorized(token skapas i login). Hämtar token ur header. TODO: Ge token till service-> return true/false
-        {
-            if (book.InStorage > 0)
-            {
-                book.InStorage--;
-            }
+        if (book.InStorage < 1)
+            return BadRequest("0 books in storage");
 
-            await _bokulousDbService.UpdateBookAsync(book.Id, book); // uppdaterar bokobjektet i db
+        book.InStorage--;
+        await _bokulousDbService.UpdateBookAsync(book.Id, book);
+        // TODO: add method for sending mock-emails :)
+        // maila orderbekräftelse till köpare
+        // ev. maila till säljare(admin eller säljare av begagnad bok)
 
-            if (book.InStorage <= 0) // purgebook- annan endpoint?
-            {
-                await _bokulousDbService.RemoveBookAsync(book.Id);
-            }
-
-            // skapa order
-            var newOrder = new Order() {
-                Books = new List<Book>() { book },
-                Buyer = buyer,
-                BuyerAdress = "", // behövs som property i user!
-                BookWeight = book.Weight,
-                ShippingCost = book.Weight * 0.05, // exempel på portoberäkning. bok på 300g kostar 15kr i porto. flytta portberäkning till hjälpklass?
-                TotalBookCost = book.Price,
-                TotalOrderCost = book.Price + book.Weight * 0.05
-            };
-            //TODO
-            // https://www.c-sharpcorner.com/article/sending-email-using-c-sharp/ (?)
-            // maila orderbekräftelse till köpare
-            // ev. maila till säljare av begagnad bok
-            // ev. maila plocklista till admin 
-            await _bokulousDbService.CreateOrderAsync(newOrder);
-
-            return Ok();
-        }
-        else return Unauthorized("Not allowed."); //köparens token stämmer inte -> risk för hackattack
+        return Ok();
     }
 
-
-    // GetAuthor/ GetBooksByAuthor: Parameter- Keyword. Return- Books[]. Beskrivning- Returnerar en JSON array med lista på böcker som matchar författaren. Method- post.
-    // har skrivit metoden i service för att inte behöva dependency injecta bookcollection 
-    [HttpPost("GetBooksByAuthor/{id:length(24)}")]
-    public async Task<ActionResult> GetBooksByAuthor(string id)
+    [HttpPost("GetBooksByAuthor")] // har skrivit metoden i service för att inte behöva dependency injecta bookcollection
+    public async Task<ActionResult> GetBooksByAuthor(string keyword)
     {
-        var books = await _bokulousDbService.GetBooksAsyncByAuthor(id);
+        var books = await _bokulousDbService.GetBooksAsyncByAuthor(keyword);
 
         return Ok(books);
     }
