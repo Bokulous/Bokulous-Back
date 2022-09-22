@@ -52,7 +52,7 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public void LoginTest()
         {
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
 
             user.Password = "hej123";
 
@@ -63,7 +63,7 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public void LoginWrongPasswordTest()
         {
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
 
             user.Password = "hej125";
 

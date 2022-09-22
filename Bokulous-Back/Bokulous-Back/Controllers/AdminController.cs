@@ -34,7 +34,7 @@ namespace Bokulous_Back.Controllers
 
             user.IsActive = false;
 
-            _bokulousDbService.UpdateUserAsync(userId, user);
+            await _bokulousDbService.UpdateUserAsync(userId, user);
 
             var check = await _bokulousDbService.GetUserAsync(userId);
 

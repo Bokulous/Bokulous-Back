@@ -95,8 +95,8 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public async Task InactivateSellerTest()
         {
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
-            var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
 
             var response = (await AdminController.InactivateUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
 
