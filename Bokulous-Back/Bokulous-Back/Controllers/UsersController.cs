@@ -99,6 +99,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok(profile);
         }
+
         [HttpPost ("Login")]
         public async Task<IActionResult> Login([FromBody] User userLogin)
         {

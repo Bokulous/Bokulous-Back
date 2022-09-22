@@ -140,13 +140,13 @@ namespace Bokulous_Back.Tests
         }
 
         [Theory]
-        [InlineData("Lasse", StatusCodes.Status401Unauthorized)]
+        [InlineData("Lasse", StatusCodes.Status403Forbidden)]
         public async void FindUsersByKeywordWhereUserIsNotAdminReturnsStatusCode403(string keyword, int expectedResult)
         {
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER2");
-            var res = await AdminController.FindUser(keyword, user.Id, user.Password);
-            var unauthorizedObject = res.Result as StatusCodeResult;        
-            Assert.Equal(expectedResult, unauthorizedObject.StatusCode);
+            var actionResult = await AdminController.FindUser(keyword, user.Id, user.Password);
+            var forbidObject = actionResult.Result as StatusCodeResult;        
+            Assert.Equal(expectedResult, forbidObject.StatusCode);
         }
 
         public void Dispose()
