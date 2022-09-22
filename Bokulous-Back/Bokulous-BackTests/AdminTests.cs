@@ -150,6 +150,20 @@ namespace Bokulous_Back.Tests
             Assert.Equal(expected, actual);
         }
 
+        [Fact()]
+        public async Task BlockUserTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.BlockUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
         public void Dispose()
         {
             TestData.RemoveDataFromDb();
