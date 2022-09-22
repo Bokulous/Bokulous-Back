@@ -1,6 +1,8 @@
 ﻿using Bokulous_Back.Models;
 using Bokulous_Back.Services;
+using Bokulous_Back.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace BookStoreApi.Controllers;
 
@@ -9,11 +11,15 @@ namespace BookStoreApi.Controllers;
 public class BooksController : ControllerBase
 {
     private readonly BokulousDbService _bokulousDbService;
+    private BookHelpers bookHelper;
 
-    public BooksController(BokulousDbService bokulousDbService) =>
+    public BooksController(BokulousDbService bokulousDbService)
+    {
         _bokulousDbService = bokulousDbService;
+        bookHelper = new (_bokulousDbService);
+    }
 
-    [HttpGet("GetBooks")]
+[HttpGet("GetBooks")]
     public async Task<List<Book>> GetBooks() =>
         await _bokulousDbService.GetBookAsync();
 
@@ -116,4 +122,170 @@ public class BooksController : ControllerBase
 
         return Ok(books);
     }
+
+    [HttpGet("GetCategories")]
+    public async Task<ActionResult<List<Category>>> GetCategories()
+    {
+        var categories = await _bokulousDbService.GetCategoryAsync();
+        if (categories.Count == 0 || categories is null)
+            return NotFound("No categories found");
+
+        return Ok(categories);
+    }
+
+    [HttpGet("GetCategoriesByKeyword")]
+    public async Task<ActionResult<List<Category>>> GetCategoriesByKeyword(string keyword)
+    {
+        if (string.IsNullOrEmpty(keyword))
+            return NotFound("Missing a keyword");
+
+        var categories = await _bokulousDbService.GetCategoryAsync();
+        if (categories.Count == 0 || categories is null)
+            return NotFound("No categories found");
+
+        var cat = categories.Where(x => x.Name.Contains(keyword)).ToList();
+
+        if (cat.Count == 0 || cat is null)
+            return NotFound("No categories mathing the name found");
+
+        return Ok(cat);
+    }
+
+    [HttpGet("GetBooksByCategory")]
+    public async Task<ActionResult<List<Category>>> GetBooksByCategory(string keyword)
+    {
+        if (string.IsNullOrEmpty(keyword))
+            return NotFound("Missing a keyword");
+
+        var allBooks = await _bokulousDbService.GetBookAsync();
+        if (allBooks.Count == 0 || allBooks is null)
+            return NotFound("No books found");
+
+        var books = allBooks.Where(x => x.Categories.Contains(keyword)).ToList();
+
+        if (books.Count == 0 || books is null)
+            return NotFound("No books found in that category");
+
+        return Ok(books);
+    }
+
+    //behöver den verkligen ta emot ett Category-objekt? Räcker det inte med en string på namnet på kategorin man vill skapa?
+    [HttpGet("AddCategory")]
+    public async Task<ActionResult> AddCategory(string category)
+    {
+        if (string.IsNullOrEmpty(category))
+            return BadRequest();
+
+        var allCategories = await _bokulousDbService.GetCategoryAsync();
+        var categories = allCategories.FirstOrDefault(x => x.Name == category);
+
+        if (categories is not null)
+            return BadRequest("Category already exists");
+
+        Category newCategory = new()
+        {
+            Name = category
+        };
+
+        await _bokulousDbService.CreateCategoryAsync(newCategory);
+
+        return Ok();
+    }
+
+    //Category object eller bara id? 
+    [HttpPut("UpdateCategory")]
+    public async Task<IActionResult> UpdateCategory(Category category, string newName)
+    {
+        if (category is null || string.IsNullOrEmpty(newName))
+            return BadRequest();
+
+        var cat = await _bokulousDbService.GetCategoryAsync(category.Id);
+
+        if (cat is null)
+            return NotFound("The category does not exist");
+
+        cat.Name = newName;
+
+        await _bokulousDbService.UpdateCategoryAsync(cat.Id, cat);
+
+        return Ok();
+    }
+
+    [HttpDelete("DeleteCategory")]
+    public async Task<ActionResult> DeleteCategory(Category category)
+    {
+        if(category is null)
+            return BadRequest();
+
+        var cat = await _bokulousDbService.GetCategoryAsync(category.Id);
+        if (cat is null)
+            return NotFound("Category dont exist");
+
+        var books = await _bokulousDbService.GetBookAsync();
+        var booksInCategory = books.Where(x => x.Categories.Contains(category.Name)).ToList();
+
+        if (booksInCategory.Count == 0 || booksInCategory is null)
+        {
+            await _bokulousDbService.RemoveCategoryAsync(category.Id);
+            return Ok();
+        }
+        
+        var response = bookHelper.RemoveCategoryFromBooks(booksInCategory, category).Result as StatusCodeResult;
+
+        if (response.StatusCode == 200)
+        {
+            await _bokulousDbService.RemoveCategoryAsync(category.Id);
+            return Ok();
+        }
+        else
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpPut("UploadImage")]
+    public async Task<IActionResult> UploadImage(string id, string imagePath)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return NotFound();
+        }
+        var book = await _bokulousDbService.GetBookAsync(id);
+
+        if (book is null)
+        {
+            return NotFound();
+        }
+
+        if (!string.IsNullOrEmpty(imagePath))
+        {
+            book.BookCover = System.IO.File.ReadAllBytes(imagePath);
+            await _bokulousDbService.UpdateBookAsync(id, book);
+        }
+
+        return Ok();
+    }
+
+    //public async Task<ActionResult<Image>> LoadImage(string id)
+    //{
+    //    var book = await _bokulousDbService.GetBookAsync(id);
+
+    //    if (book is null)
+    //    {
+    //        return NotFound();
+    //    }
+    //    if (book.BookCover == null || book.BookCover.Length == 0)
+    //    {
+    //        return NotFound("Bild saknas");
+    //    }
+
+    //    Image img;
+    //    using (MemoryStream ms = new MemoryStream(book.BookCover))
+    //    {
+    //        img = Image.FromStream(ms);
+    //        //return img;
+    //    }
+
+    //    return img;     
+    //}
 }
