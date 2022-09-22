@@ -68,8 +68,6 @@ namespace Bokulous_Back.Controllers
 
             return Ok(profile);
         }
-
-        [AllowAnonymous]
         [HttpPost ("Login")]
         public async Task<IActionResult> Login([FromBody] User userLogin)
         {
