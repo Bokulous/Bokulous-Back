@@ -8,6 +8,7 @@ namespace Bokulous_Back.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
+
         public string Mail { get; set; } = "";
         public string Username { get; set; } = "";
         public string Password { get; set; } = "";

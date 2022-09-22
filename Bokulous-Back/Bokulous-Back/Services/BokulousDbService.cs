@@ -52,6 +52,9 @@ namespace Bokulous_Back.Services
         public async Task RemoveBookAsync(string id) =>
             await _booksCollection.DeleteOneAsync(x => x.Id == id);
 
+        public async Task<List<Book>> GetBooksAsyncByAuthor(string keyword) =>   // behöver ligga i service för att komma åt bookscollection
+            await _booksCollection.Find(x => x.Authors.Any(y => y.Contains(keyword))).ToListAsync();
+
         //USERS CRUD
         public async Task<List<User>> GetUserAsync() =>
             await _usersCollection.Find(_ => true).ToListAsync();
@@ -83,6 +86,7 @@ namespace Bokulous_Back.Services
 
         public async Task RemoveCategoryAsync(string id) =>
             await _categoriesCollection.DeleteOneAsync(x => x.Id == id);
+
         //Login
         public async Task<User> LoginAsync(User userLogin)
         {

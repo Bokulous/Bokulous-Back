@@ -1,29 +1,25 @@
-﻿using Xunit;
-using Bokulous_Back;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Bokulous_Back.Services;
+﻿using Bokulous_Back.Controllers;
 using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
-using Bokulous_Back.Controllers;
-using Newtonsoft.Json;
+using Bokulous_Back.Services;
 using BookStoreApi.Controllers;
 using System.Diagnostics;
+using Xunit;
+using System.Threading.Tasks;
 
 namespace Bokulous_Back.Tests
 {
-    public class BooksTests
+    [Collection("Sequential")]
+    public class BooksTests : IDisposable
     {
-        BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
+        private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
         private BooksController BooksController;
         private UsersController UsersController;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
+        public List<Book?> TestBooks { get; set; }
 
         public BooksTests()
         {
@@ -31,8 +27,8 @@ namespace Bokulous_Back.Tests
             UsersController = new(dbService);
             BooksController = new(dbService);
             TestUsers = new();
+            TestBooks = new();
 
-            //Test admin
             TestUsers.Add(new User()
             {
                 IsActive = true,
@@ -45,7 +41,6 @@ namespace Bokulous_Back.Tests
                 Username = "TEST_ADMIN"
             });
 
-            //Test user
             TestUsers.Add(new User()
             {
                 IsActive = true,
@@ -58,7 +53,6 @@ namespace Bokulous_Back.Tests
                 Username = "TEST_USER1"
             });
 
-            //Test user
             TestUsers.Add(new User()
             {
                 IsActive = true,
@@ -71,15 +65,71 @@ namespace Bokulous_Back.Tests
                 Username = "TEST_USER2"
             });
 
-            //Adding test users to database
-            TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
+            TestBooks.Add(new Book()
+            {
+                ISBN = "12345",
+                Title = "TEST",
+                Categories = new string[] { "Skräck" },
+                Language = "Svenska",
+                Authors = new string[] { "Testy Testersson" },
+                Published = 2022,
+                Weight = 300,
+                IsUsed = false,
+                InStorage = 5,
+                Price = 100,
+                Seller = null,
+                BookCover = default
+            });
 
+            TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
+            TestBooks.ForEach(async (book) => await dbService.CreateBookAsync(book));
+            Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
+            TestUsers = dbService.GetUserAsync().Result;
+            TestBooks = dbService.GetBookAsync().Result;
         }
+
         [Fact()]
-        public void TestMethodTest()
+        public void BuyBook_Pass()
         {
-            Assert.True(true, "This test needs an implementati");
+            //arrange
+            var buyer = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+
+            var seller = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER2");
+
+            var book = TestBooks.FirstOrDefault(x => x.Title == "TEST");
+
+            BookUser bookUser = new()
+            {
+                Id = seller.Id,
+                Mail = seller.Mail,
+                Username = seller.Username
+            };
+            book.Seller = bookUser;
+
+            dbService.UpdateBookAsync(book.Id, book);
+
+            //act
+            var response = BooksController.BuyBook(book.Id, buyer.Id, buyer.Password).Result as Microsoft.AspNetCore.Mvc.StatusCodeResult;
+            //StatusCodeResult = hämtar statuskoden
+
+            //assert
+            Assert.True(response.StatusCode == 200);
+        }
+
+        [Fact()]
+        private void GetBooksByAuthor_Pass()
+        {
+            //arrange
+            var keyword = "Ekwurtzel";
+
+            //act
+            var response = BooksController.GetBooksByAuthor(keyword).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+            var value = response.Value as List<Book>;
+            //ObjectResult = hämtar hela objektet
+
+            //assert
+            Assert.True(value.Count > 0);
         }
 
         public void Dispose()
@@ -100,7 +150,16 @@ namespace Bokulous_Back.Tests
                     Debug.WriteLine("Removing user: " + user?.Username);
                 }
             });
-        }
 
+            TestBooks = dbService.GetBookAsync().Result;
+
+            TestBooks.ForEach(async (book) =>
+            {
+                if (book.Title.Contains("TEST"))
+                {
+                    await dbService.RemoveBookAsync(book.Id);
+                }
+            });
+        }
     }
 }
