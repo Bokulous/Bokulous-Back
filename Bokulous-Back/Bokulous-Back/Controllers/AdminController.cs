@@ -84,5 +84,37 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
+        [HttpDelete("PurgeEmptyBooks")]
+        public async Task<IActionResult> PurgeEmptyBooks(string adminId, string password)
+        {
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+            var books = await _bokulousDbService.GetBookAsync();
+
+            if (admin is null)
+                return NotFound("User not found");
+
+            if (books is null)
+                return NotFound("No Books found");
+
+            books.ForEach(async (book) =>
+            {
+                if (book.InStorage < 1)
+                    await _bokulousDbService.RemoveBookAsync(book.Id);
+            });
+
+            books = await _bokulousDbService.GetBookAsync();
+            bool removedAll = true;
+
+            books.ForEach(book =>
+            {
+                if (book.InStorage < 1)
+                    removedAll = true;
+            });
+
+            if(!removedAll)
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+
+            return Ok();
+        }
     }
 }
