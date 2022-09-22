@@ -162,5 +162,31 @@ namespace Bokulous_Back.Controllers
 
             return Ok(users);
         }
+
+        public async Task<ActionResult> BlockUser(string userId, string adminId, string password)
+        {
+            var user = await _bokulousDbService.GetUserAsync(userId);
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+
+            if (user is null)
+                return NotFound("User could not be found");
+
+            if (admin is null)
+                return NotFound("Admin could not be found");
+
+            if (!await UserHelpers.CheckIsAdmin(adminId, password))
+                return Forbid("Failed admin check");
+
+            user.IsBlocked = true;
+
+            await _bokulousDbService.UpdateUserAsync(userId, user);
+
+            var check = await _bokulousDbService.GetUserAsync(userId);
+
+            if (!check.IsBlocked)
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+
+            return Ok();
+        }
     }
 }
