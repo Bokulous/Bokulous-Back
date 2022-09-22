@@ -78,6 +78,9 @@ namespace Bokulous_Back.Controllers
             if (book is null)
                 return NotFound("Book not found");
 
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, password))
+                return new StatusCodeResult(StatusCodes.Status403Forbidden);
+
             if (!await UserHelpers.CheckIsAdmin(admin.Id, admin.Password))
                 return new StatusCodeResult(StatusCodes.Status403Forbidden);
 
@@ -96,6 +99,9 @@ namespace Bokulous_Back.Controllers
 
             if (books is null)
                 return NotFound("No Books found");
+
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, password))
+                return new StatusCodeResult(StatusCodes.Status403Forbidden);
 
             books.ForEach(async (book) =>
             {
@@ -129,7 +135,7 @@ namespace Bokulous_Back.Controllers
             if (book is null)
                 return NotFound("Book not found");
 
-            if (!await UserHelpers.CheckIsAdmin(admin.Id, admin.Password))
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, password))
                 return new StatusCodeResult(StatusCodes.Status403Forbidden);
 
             book.InStorage = amount;
@@ -149,7 +155,7 @@ namespace Bokulous_Back.Controllers
             if (admin is null)
                 return NotFound("User not found");
 
-            if (!await UserHelpers.CheckIsAdmin(admin.Id, admin.Password))
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, password))
                 return new StatusCodeResult(StatusCodes.Status403Forbidden);
 
             var users = await _bokulousDbService.GetUserAsync();

@@ -107,11 +107,11 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public async Task SetAmount()
+        public async Task SetAmountTest()
         {
             const int SET_BOOK_INSTORAGE = 5;
 
-            var book = TestData.Books.First();
+            var book = TestData.Books.FirstOrDefault();
             var admin = TestData.Users.FirstOrDefault(admin => admin.Username == "TEST_ADMIN");
 
             var response = (await AdminController.SetAmount(SET_BOOK_INSTORAGE, book.Id, admin.Id, admin.Password)) as StatusCodeResult;
