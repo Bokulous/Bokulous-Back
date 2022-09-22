@@ -14,8 +14,10 @@ using System.Diagnostics;
 
 namespace Bokulous_Back.Tests
 {
-    public class UsersTests
+    [Collection("Sequential")]
+    public class UsersTests : IDisposable
     {
+        
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
@@ -71,21 +73,25 @@ namespace Bokulous_Back.Tests
 
             //Adding test users to database
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-
+            Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
         }
+        
+        [Fact()]
         public async Task ShowProfileTest()
         {
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
 
-            user.Password = null;
+            user.Password = "";
+
+            var result = (await UsersController.ShowProfile(user)).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
 
             var expected = user;
-            var actual = UsersController.ShowProfile(user);
+            var actual = result.Value;
 
             Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
         }
-
+        
         [Fact()]
         public void LoginTest()
         {
@@ -148,5 +154,6 @@ namespace Bokulous_Back.Tests
                 }
             });
         }
+        
     }
 }

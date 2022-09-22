@@ -64,7 +64,7 @@ namespace Bokulous_Back.Controllers
             if (profile is null)
                 return NotFound();
 
-            profile.Password = null;
+            profile.Password = "";
 
             return Ok(profile);
         }

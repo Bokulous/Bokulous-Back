@@ -15,7 +15,8 @@ using System.Diagnostics;
 
 namespace Bokulous_Back.Tests
 {
-    public class BooksTests
+    [Collection("Sequential")]
+    public class BooksTests : IDisposable
     {
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
@@ -73,7 +74,7 @@ namespace Bokulous_Back.Tests
 
             //Adding test users to database
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-
+            Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
         }
         [Fact()]
@@ -101,6 +102,5 @@ namespace Bokulous_Back.Tests
                 }
             });
         }
-
     }
 }
