@@ -34,7 +34,7 @@ namespace Bokulous_Back.Controllers
 
             user.IsActive = false;
 
-            _bokulousDbService.UpdateUserAsync(userId, user);
+            await _bokulousDbService.UpdateUserAsync(userId, user);
 
             var check = await _bokulousDbService.GetUserAsync(userId);
 
@@ -61,6 +61,26 @@ namespace Bokulous_Back.Controllers
             user.Password = userNewPassword;
 
             await _bokulousDbService.UpdateUserAsync(user.Id, user);
+
+            return Ok();
+        }
+
+        [HttpDelete("PurgeBook")]
+        public async Task<ActionResult> PurgeBook(string bookId, string adminId, string password)
+        {
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+            var book = await _bokulousDbService.GetBookAsync(bookId);
+
+            if (admin is null)
+                return NotFound("User not found");
+
+            if (book is null)
+                return NotFound("Book not found");
+
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, admin.Password))
+                return new StatusCodeResult(StatusCodes.Status403Forbidden);
+
+            await _bokulousDbService.RemoveBookAsync(book.Id);
 
             return Ok();
         }
