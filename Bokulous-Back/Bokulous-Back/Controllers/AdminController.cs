@@ -116,5 +116,29 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
+
+        public async Task<IActionResult> SetAmount(int amount, string bookId, string? adminId, string password)
+        {
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+            var book = await _bokulousDbService.GetBookAsync(bookId);
+
+            if (admin is null)
+                return NotFound("User not found");
+
+            if (book is null)
+                return NotFound("Book not found");
+
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, admin.Password))
+                return new StatusCodeResult(StatusCodes.Status403Forbidden);
+
+            book.InStorage = amount;
+
+            await _bokulousDbService.UpdateBookAsync(bookId, book);
+
+            if ((await _bokulousDbService.GetBookAsync(book.Id)).InStorage != amount)
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+
+            return Ok();
+        }
     }
 }

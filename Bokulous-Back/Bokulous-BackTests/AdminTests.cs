@@ -107,6 +107,22 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
+        public async Task SetAmount()
+        {
+            const int SET_BOOK_INSTORAGE = 5;
+
+            var book = TestData.Books.First();
+            var admin = TestData.Users.FirstOrDefault(admin => admin.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.SetAmount(SET_BOOK_INSTORAGE, book.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
         public async Task InactivateSellerTest()
         {
             var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
