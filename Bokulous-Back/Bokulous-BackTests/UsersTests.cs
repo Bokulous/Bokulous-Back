@@ -148,6 +148,49 @@ namespace Bokulous_Back.Tests
             Assert.True(value.Mail == user.Mail && value.Username == user.Username);
         }
 
+        [Fact()]
+        public void ForgotPasswordTest()
+        {
+            //arrange
+            var user = TestUsers.FirstOrDefault(x => x.Mail == "bla1@bla.com");
+
+            //var password = "newpassword123";
+
+            //act
+            var response = UsersController.ForgotPassword(user.Mail).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+            //var value = response.Value as User;
+
+            //assert
+            //Assert.True(value.Password == user.Password);
+            Assert.True(response.StatusCode == 200);
+        }
+
+        [Fact()]
+        public void ForgotUsernameTest()
+        {
+            //arrange
+            var user = TestUsers.FirstOrDefault(x => x.Mail == "bla1@bla.com");
+
+            //act
+            var response = UsersController.ForgotUsername(user.Mail).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+
+            //assert
+            Assert.True(response.StatusCode == 200);
+        }
+
+        [Fact()]
+        public void ActivateAccountTest()
+        {
+            //arrange
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+
+            //act
+            var response = UsersController.ActivateAccount(user.Id).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+
+            //assert
+            Assert.True(response.StatusCode == 200);
+        }
+        
         public void Dispose()
         {
             TestUsers = dbService.GetUserAsync().Result;

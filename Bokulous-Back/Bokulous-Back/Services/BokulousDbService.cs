@@ -99,5 +99,7 @@ namespace Bokulous_Back.Services
 
             return null;
         }
+        public async Task<User?> GetUserMailAsync(string mail) =>
+            await _usersCollection.Find(x => x.Mail == mail).FirstOrDefaultAsync();
     }
 }

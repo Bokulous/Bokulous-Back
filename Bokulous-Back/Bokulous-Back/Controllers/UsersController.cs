@@ -105,5 +105,50 @@ namespace Bokulous_Back.Controllers
 
             return Forbid("Wrong password");
         }
+
+        [HttpPost("ForgotPassword")]
+        public async Task<ActionResult> ForgotPassword(string mail)
+        {
+            var currentUser = await _bokulousDbService.GetUserMailAsync(mail);
+
+            if (currentUser != null)
+            {
+                currentUser.Password = "newpassword123";
+                await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
+                return Ok(currentUser);
+            }
+
+            return NotFound("Mail does not exist");
+        }
+
+        [HttpPost("ForgotUsername")]
+        public async Task<ActionResult> ForgotUsername(string mail)
+        {
+            var currentUser = await _bokulousDbService.GetUserMailAsync(mail);
+
+            if (currentUser != null)
+            {
+                currentUser.Username = "newusername123";
+                await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
+                return Ok(currentUser);
+            }
+
+            return NotFound("Mail does not exist");
+        }
+
+        [HttpPost("ActivateAccount")]
+        public async Task<ActionResult> ActivateAccount(string id)
+        {
+            var user = await _bokulousDbService.GetUserAsync(id);
+
+            if (user != null)
+            {
+                user.IsActive = true;
+                await _bokulousDbService.UpdateUserAsync(user.Id, user);
+                return Ok(user);
+            }
+
+            return NotFound("User does not exist");
+        }
     }
 }
