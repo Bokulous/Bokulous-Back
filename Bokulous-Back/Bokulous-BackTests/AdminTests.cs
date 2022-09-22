@@ -1,12 +1,12 @@
-﻿using Xunit;
-using Bokulous_Back;
 using Bokulous_Back.Controllers;
-using Bokulous_Back.Services;
+using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
+using Bokulous_Back.Services;
 using System.Diagnostics;
 using Bokulous_Back.Helpers;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc;
+using Xunit;
 
 namespace Bokulous_Back.Tests
 {
@@ -153,6 +153,15 @@ namespace Bokulous_Back.Tests
                 {
                     await dbService.RemoveUserAsync(user.Id);
                     Debug.WriteLine("Removing user: " + user?.Username);
+                }
+            });
+
+            var TestBooks = dbService.GetBookAsync().Result;
+            TestBooks.ForEach(async (book) =>
+            {
+                if (book.Title.Contains("TEST"))
+                {
+                    await dbService.RemoveBookAsync(book.Id);
                 }
             });
         }

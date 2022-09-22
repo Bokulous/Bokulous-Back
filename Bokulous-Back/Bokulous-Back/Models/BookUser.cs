@@ -2,10 +2,10 @@
 {
     public class BookUser
     {
-        string? id { get; set; }
+        public string? Id { get; set; }
 
-        string Mail { get; set; } = "";
+        public string Mail { get; set; } = "";
 
-        string Username { get; set; } = "";
+        public string Username { get; set; } = "";
     }
 }

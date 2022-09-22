@@ -7,8 +7,8 @@ namespace Bokulous_Back.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        //TODO: Får vara null?
         public string? Id { get; set; }
+
         public string Name { get; set; } = "";
     }
 }
