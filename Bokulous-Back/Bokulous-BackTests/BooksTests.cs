@@ -5,6 +5,7 @@ using Bokulous_Back.Services;
 using BookStoreApi.Controllers;
 using System.Diagnostics;
 using Xunit;
+using System.Threading.Tasks;
 
 namespace Bokulous_Back.Tests
 {
@@ -81,11 +82,10 @@ namespace Bokulous_Back.Tests
             });
 
             TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
+            TestBooks.ForEach(async (book) => await dbService.CreateBookAsync(book));
             Thread.Sleep(1000);
             TestUsers = dbService.GetUserAsync().Result;
             TestUsers = dbService.GetUserAsync().Result;
-
-            TestBooks.ForEach(async (book) => await dbService.CreateBookAsync(book));
             TestBooks = dbService.GetBookAsync().Result;
         }
 
