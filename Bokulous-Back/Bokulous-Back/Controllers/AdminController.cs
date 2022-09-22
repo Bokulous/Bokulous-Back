@@ -123,7 +123,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
-
+        [HttpDelete("SetAmount")]
         public async Task<IActionResult> SetAmount(int amount, string bookId, string? adminId, string password)
         {
             var admin = await _bokulousDbService.GetUserAsync(adminId);
@@ -147,7 +147,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
-
+        [HttpDelete("ListUsers")]
         public async Task<ActionResult<List<User>>> ListUsers(string adminId, string password)
         {
             var admin = await _bokulousDbService.GetUserAsync(adminId);
@@ -162,7 +162,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok(users);
         }
-
+        [HttpDelete("BlockUsers")]
         public async Task<ActionResult> BlockUser(string userId, string adminId, string password)
         {
             var user = await _bokulousDbService.GetUserAsync(userId);
@@ -184,6 +184,32 @@ namespace Bokulous_Back.Controllers
             var check = await _bokulousDbService.GetUserAsync(userId);
 
             if (!check.IsBlocked)
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+
+            return Ok();
+        }
+        [HttpDelete("UnBlockUser")]
+        public async Task<ActionResult> UnBlockUser(string userId, string adminId, string password)
+        {
+            var user = await _bokulousDbService.GetUserAsync(userId);
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+
+            if (user is null)
+                return NotFound("User could not be found");
+
+            if (admin is null)
+                return NotFound("Admin could not be found");
+
+            if (!await UserHelpers.CheckIsAdmin(adminId, password))
+                return Forbid("Failed admin check");
+
+            user.IsBlocked = false;
+
+            await _bokulousDbService.UpdateUserAsync(userId, user);
+
+            var check = await _bokulousDbService.GetUserAsync(userId);
+
+            if (check.IsBlocked)
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
 
             return Ok();
