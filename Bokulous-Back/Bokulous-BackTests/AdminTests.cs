@@ -107,11 +107,11 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public async Task SetAmount()
+        public async Task SetAmountTest()
         {
             const int SET_BOOK_INSTORAGE = 5;
 
-            var book = TestData.Books.First();
+            var book = TestData.Books.FirstOrDefault();
             var admin = TestData.Users.FirstOrDefault(admin => admin.Username == "TEST_ADMIN");
 
             var response = (await AdminController.SetAmount(SET_BOOK_INSTORAGE, book.Id, admin.Id, admin.Password)) as StatusCodeResult;
@@ -129,6 +129,20 @@ namespace Bokulous_Back.Tests
             var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
 
             var response = (await AdminController.InactivateUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task ListUsers()
+        {
+            var users = TestData.Users.ToList();
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.ListUsers(admin.Id, admin.Password)).Result as ObjectResult;
 
             var expected = 200;
             var actual = response?.StatusCode ?? throw new Exception("reponse was null");

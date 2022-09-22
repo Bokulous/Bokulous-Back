@@ -1,4 +1,5 @@
 ﻿using Bokulous_Back.Helpers;
+using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -77,6 +78,9 @@ namespace Bokulous_Back.Controllers
             if (book is null)
                 return NotFound("Book not found");
 
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, password))
+                return new StatusCodeResult(StatusCodes.Status403Forbidden);
+
             if (!await UserHelpers.CheckIsAdmin(admin.Id, admin.Password))
                 return new StatusCodeResult(StatusCodes.Status403Forbidden);
 
@@ -95,6 +99,9 @@ namespace Bokulous_Back.Controllers
 
             if (books is null)
                 return NotFound("No Books found");
+
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, password))
+                return new StatusCodeResult(StatusCodes.Status403Forbidden);
 
             books.ForEach(async (book) =>
             {
@@ -128,7 +135,7 @@ namespace Bokulous_Back.Controllers
             if (book is null)
                 return NotFound("Book not found");
 
-            if (!await UserHelpers.CheckIsAdmin(admin.Id, admin.Password))
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, password))
                 return new StatusCodeResult(StatusCodes.Status403Forbidden);
 
             book.InStorage = amount;
@@ -139,6 +146,21 @@ namespace Bokulous_Back.Controllers
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
 
             return Ok();
+        }
+
+        public async Task<ActionResult<List<User>>> ListUsers(string adminId, string password)
+        {
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+
+            if (admin is null)
+                return NotFound("User not found");
+
+            if (!await UserHelpers.CheckIsAdmin(admin.Id, password))
+                return new StatusCodeResult(StatusCodes.Status403Forbidden);
+
+            var users = await _bokulousDbService.GetUserAsync();
+
+            return Ok(users);
         }
     }
 }
