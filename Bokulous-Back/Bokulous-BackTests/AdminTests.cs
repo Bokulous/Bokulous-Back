@@ -1,4 +1,4 @@
-﻿using Bokulous_Back.Controllers;
+using Bokulous_Back.Controllers;
 using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
@@ -6,6 +6,9 @@ using Bokulous_BackTests;
 using BookStoreApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Bokulous_Back.Helpers;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Bokulous_Back.Tests
@@ -87,6 +90,20 @@ namespace Bokulous_Back.Tests
             var actual = response.StatusCode;
 
             Assert.True(true);
+        }
+
+        [Fact()]
+        public async Task InactivateSellerTest()
+        {
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.InactivateUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response.StatusCode;
+
+            Assert.Equal(expected, actual);
         }
 
         public void Dispose()

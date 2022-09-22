@@ -17,6 +17,33 @@ namespace Bokulous_Back.Controllers
             UserHelpers = new(_bokulousDbService);
         }
 
+        [HttpPut("InactivateUser")]
+        public async Task<ActionResult> InactivateUser(string userId, string adminId, string adminPassword)
+        {
+            var user = await _bokulousDbService.GetUserAsync(userId);
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+
+            if (user is null)
+                return NotFound("User could not be found");
+
+            if (admin is null)
+                return NotFound("Admin could not be found");
+
+            if (!await UserHelpers.CheckIsAdmin(adminId, adminPassword))
+                return Forbid("Failed admin check");
+
+            user.IsActive = false;
+
+            _bokulousDbService.UpdateUserAsync(userId, user);
+
+            var check = await _bokulousDbService.GetUserAsync(userId);
+
+            if(check.IsActive)
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+
+            return Ok();
+        }
+
         [HttpPut("ChangeUserPass")]
         public async Task<ActionResult> ChangeUserPass(string userId, string userNewPassword, string adminId, string adminPassword)
         {

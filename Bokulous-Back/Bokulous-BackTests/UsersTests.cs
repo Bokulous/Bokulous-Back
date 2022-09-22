@@ -49,30 +49,28 @@ namespace Bokulous_Back.Tests
             Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
         }
 
-        //FEL VID MERGE?
+        [Fact()]
+        public void LoginTest()
+        {
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
 
-        //[Fact()]
-        //public void LoginTest()
-        //{
-        //    var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            user.Password = "hej123";
 
-        //    user.Password = "hej123";
+            var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.OkObjectResult;
 
-        //    var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.OkObjectResult;
+            Assert.True(response.StatusCode == 200);
+        }
+        [Fact()]
+        public void LoginWrongPasswordTest()
+        {
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
 
-        //    Assert.True(response.StatusCode == 200);
-        //}
-        //[Fact()]
-        //public void LoginWrongPasswordTest()
-        //{
-        //    var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            user.Password = "hej125";
 
-        //    user.Password = "hej125";
+            var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.NotFoundObjectResult;
 
-        //    var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.NotFoundObjectResult;
-
-        //    Assert.False(response.StatusCode == 200);
-        //}
+            Assert.False(response.StatusCode == 200);
+        }
 
         [Fact()]
         public void RegisterTest()
