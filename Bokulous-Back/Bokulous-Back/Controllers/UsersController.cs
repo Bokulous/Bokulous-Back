@@ -41,6 +41,11 @@ namespace Bokulous_Back.Controllers
             return Ok(user);
         }
 
+        [HttpPost("AddUser")]
+        public async Task<ActionResult> AddUser(User newUser)
+        {
+            await _bokulousDbService.CreateUserAsync(newUser);
+
             return Ok();
         }
 
