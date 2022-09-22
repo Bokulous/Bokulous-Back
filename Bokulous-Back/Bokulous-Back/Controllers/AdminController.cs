@@ -44,7 +44,7 @@ namespace Bokulous_Back.Controllers
         public async Task<ActionResult<List<User>>> FindUser(string keyword, string adminId, string adminPassword)
         {
             if (!await UserHelpers.CheckIsAdmin(adminId, adminPassword))
-                return Forbid();
+                return Unauthorized();
 
             if (string.IsNullOrEmpty(keyword))
                 return NotFound("Missing a keyword");

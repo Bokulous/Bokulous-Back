@@ -10,6 +10,7 @@ using BookStoreApi.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+using System.Net;
 
 namespace Bokulous_Back.Tests
 {
@@ -133,18 +134,18 @@ namespace Bokulous_Back.Tests
         {
             var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
             var actionResult = await AdminController.FindUser(keyword, admin.Id, admin.Password);
-            var statusCodeResult = actionResult as ActionResult<List<User>>;
-            Assert.Equal(expectedResult, statusCodeResult.Value);
+            var notFoundObject = actionResult.Result as ObjectResult;
+            Assert.Equal(expectedResult, notFoundObject.StatusCode);
         }
 
         [Theory]
-        [InlineData(StatusCodes.Status403Forbidden)]
-        public async void FindUsersByKeywordWhereUserIsNotAdminReturnsStatusCode403(object expectedResult)
+        [InlineData("Lasse", StatusCodes.Status401Unauthorized)]
+        public async void FindUsersByKeywordWhereUserIsNotAdminReturnsStatusCode403(string keyword, int expectedResult)
         {
             var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER2");
-            var actionResult = await AdminController.FindUser("romantik", user.Id, user.Password);           
-            var statusCodeResult = actionResult as ActionResult<List<User>>;
-            Assert.Equal(expectedResult, statusCodeResult.Value);
+            var res = await AdminController.FindUser(keyword, user.Id, user.Password);
+            var unauthorizedObject = res.Result as StatusCodeResult;        
+            Assert.Equal(expectedResult, unauthorizedObject.StatusCode);
         }
 
         public void Dispose()
