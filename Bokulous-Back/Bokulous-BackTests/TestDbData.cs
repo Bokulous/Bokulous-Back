@@ -111,9 +111,20 @@ namespace Bokulous_BackTests
 
             Thread.Sleep(1000);
 
-            Users = _dbService.GetUserAsync().Result;
-            Books = _dbService.GetBookAsync().Result;
-            Categories = _dbService.GetCategoryAsync().Result;
+            Users = _dbService.GetUserAsync().Result
+                .Where(x => x.Username
+                    .Contains("TEST_"))
+                .ToList();
+
+            Books = _dbService.GetBookAsync().Result
+                .Where(x => x.Title
+                    .Contains("TEST"))
+                .ToList();
+
+            Categories = _dbService.GetCategoryAsync().Result
+                .Where(x => x.Name
+                    .Contains("TEST"))
+                .ToList();
         }
 
         public void RemoveDataFromDb()
