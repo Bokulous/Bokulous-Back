@@ -1,8 +1,11 @@
-﻿using Bokulous_Back.Controllers;
+using Bokulous_Back.Controllers;
 using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using System.Diagnostics;
+using Bokulous_Back.Helpers;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Bokulous_Back.Tests
@@ -116,6 +119,20 @@ namespace Bokulous_Back.Tests
             var expected = NEW_PASS;
             var actual = (await dbService.GetUserAsync())
                             .FirstOrDefault(x => x.Id == user.Id).Password;
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task InactivateSellerTest()
+        {
+            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.InactivateUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response.StatusCode;
 
             Assert.Equal(expected, actual);
         }
