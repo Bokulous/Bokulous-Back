@@ -41,10 +41,17 @@ namespace Bokulous_Back.Controllers
             return Ok(user);
         }
 
+        [HttpPost("AddUser")]
+        public async Task<ActionResult> AddUser(User newUser)
+        {
+            await _bokulousDbService.CreateUserAsync(newUser);
+
+            return Ok();
+        }
 
         [HttpPost("Register")]
         public async Task<ActionResult> Register(User newUser)
-        {
+        { 
             if (!userHelper.CheckIsUsernameValid(newUser.Username))
                 return BadRequest("Username is not valid");
 
@@ -79,6 +86,24 @@ namespace Bokulous_Back.Controllers
             }
 
             return NotFound("User not found");
+        }
+
+        [HttpPost("EditProfile")]
+        public async Task<ActionResult> EditProfile(string id, string username, string email, string password)
+        {
+            var user = await _bokulousDbService.GetUserAsync(id);
+
+            if (user.Password == password)
+            {
+                user.Username = username;
+                user.Mail = email;
+
+                await _bokulousDbService.UpdateUserAsync(user.Id, user);
+
+                return Ok(user);
+            }
+
+            return Forbid("Wrong password");
         }
     }
 }

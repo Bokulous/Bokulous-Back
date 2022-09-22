@@ -1,8 +1,5 @@
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
