@@ -87,9 +87,23 @@ namespace Bokulous_Back.Tests
             var response = (await AdminController.PurgeBook(book.Id, admin.Id, admin.Password)) as StatusCodeResult;
 
             var expected = 200;
-            var actual = response.StatusCode;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
 
-            Assert.True(true);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task PurgeEmptyBooksTest()
+        {
+            var books = TestData.Books.ToList();
+            var admin = TestData.Users.FirstOrDefault(admin => admin.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.PurgeEmptyBooks(admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact()]
@@ -101,7 +115,7 @@ namespace Bokulous_Back.Tests
             var response = (await AdminController.InactivateUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
 
             var expected = 200;
-            var actual = response.StatusCode;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
 
             Assert.Equal(expected, actual);
         }
