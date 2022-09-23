@@ -1,4 +1,5 @@
-﻿using Bokulous_Back.Services;
+﻿using Bokulous_Back.Models;
+using Bokulous_Back.Services;
 
 namespace Bokulous_Back.Helpers
 {
@@ -39,6 +40,20 @@ namespace Bokulous_Back.Helpers
                 return false;
 
             if (username.Length < USERNAME_MIN_LENGTH)
+                return false;
+
+            return true;
+        }
+
+        public bool CheckEmail(string mail)
+        {
+            if (mail is null)
+                return false;
+
+            if (!mail.Contains("@"))
+                return false;
+
+            if (!mail.Contains("."))
                 return false;
 
             return true;

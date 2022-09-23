@@ -13,6 +13,8 @@ namespace Bokulous_Back.Controllers
         private BokulousDbService _bokulousDbService;
         private UserHelpers userHelper;
 
+        Random rnd = new Random();
+        
         public UsersController(BokulousDbService bokulousDbService)
         {
             _bokulousDbService = bokulousDbService;
@@ -51,7 +53,10 @@ namespace Bokulous_Back.Controllers
 
         [HttpPost("Register")]
         public async Task<ActionResult> Register(User newUser)
-        { 
+        {
+            if (!userHelper.CheckEmail(newUser.Mail))
+                return BadRequest("Mail is not valid");
+            
             if (!userHelper.CheckIsUsernameValid(newUser.Username))
                 return BadRequest("Username is not valid");
 
@@ -113,7 +118,7 @@ namespace Bokulous_Back.Controllers
 
             if (currentUser != null)
             {
-                currentUser.Password = "newpassword123";
+                currentUser.Password = "newpassword123" + rnd.Next(1, 10).ToString();
                 await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
                 return Ok(currentUser);
             }
@@ -128,7 +133,7 @@ namespace Bokulous_Back.Controllers
 
             if (currentUser != null)
             {
-                currentUser.Username = "newusername123";
+                currentUser.Username = "newusername" + rnd.Next(1, 1000).ToString();
                 await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
                 return Ok(currentUser);
             }
