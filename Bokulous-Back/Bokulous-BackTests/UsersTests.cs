@@ -83,7 +83,7 @@ namespace Bokulous_Back.Tests
                 IsSeller = false,
                 Mail = "bla6@bla.com",
                 Password = "hej1234",
-                Previous_Orders = new UserBooks[0],
+                Previous_Orders = new List<UserBooks>(),
                 Username = "TEST_USER3"
             };
             TestData.Users.Add(user);

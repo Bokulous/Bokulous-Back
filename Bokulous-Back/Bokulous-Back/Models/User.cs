@@ -14,8 +14,8 @@ namespace Bokulous_Back.Models
         public string Password { get; set; } = "";
         public bool IsActive { get; set; }
         public bool IsBlocked { get; set; }
-        public UserBooks[]? Previous_Orders { get; set; }
-        public UserBooks[]? Previous_Books_Sold { get; set; }
+        public List<UserBooks>? Previous_Orders { get; set; }
+        public List<UserBooks>? Previous_Books_Sold { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsSeller { get; set; }
     }
