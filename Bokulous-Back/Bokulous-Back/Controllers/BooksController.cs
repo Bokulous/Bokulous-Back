@@ -243,6 +243,23 @@ public class BooksController : ControllerBase
         }
     }
 
+    //Lägger till book i kategorin..... Lägger till kategori till boken istället?
+    [HttpPut("AddBookToCategory")]
+    public async Task<ActionResult> AddBookToCategory(Book book, Category category)
+    {
+        if (book is null || category is null)
+            return BadRequest();
+
+        var books = await _bokulousDbService.GetBookAsync(book.Id);
+
+        if(books is null)
+            return BadRequest();
+
+        books.Categories = new List<string>(books.Categories) { category.Name }.ToArray();
+        await _bokulousDbService.UpdateBookAsync(books.Id, books);
+        return Ok();
+    }
+
     [HttpPut("UploadImage")]
     public async Task<IActionResult> UploadImage(string id, string imagePath)
     {

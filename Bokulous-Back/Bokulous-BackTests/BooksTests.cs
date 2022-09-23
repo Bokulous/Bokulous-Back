@@ -218,7 +218,6 @@ namespace Bokulous_Back.Tests
             Assert.True(statusCodeResult.StatusCode == 404);
         }
 
-        //Testa BookHelper.RemoveCategoryFromBooks
         [Fact()]
         public async void RemoveCategoryFromBooksWhereListIsEmptyReturns400()
         {
