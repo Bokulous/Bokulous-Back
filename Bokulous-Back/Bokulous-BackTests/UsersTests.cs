@@ -27,7 +27,6 @@ namespace Bokulous_Back.Tests
         public User? TestAdmin { get; set; }
         public User userDontExist;
 
-
         public UsersTests()
         {
             UserHelpers = new(dbService);
@@ -140,6 +139,8 @@ namespace Bokulous_Back.Tests
         [InlineData("123456", StatusCodes.Status404NotFound)]
         public async void ChangePasswordWhereUserIsNullReturnsStatusCode400(string password, int expectedResult)
         {
+            var userDontExist = new User()
+            { Id = "111111111111111111111111"};
             var actionResult = await UsersController.ChangePassword(userDontExist.Id, password);
             var statusCodeResult = (IStatusCodeActionResult)actionResult;
             Assert.Equal(expectedResult, statusCodeResult.StatusCode);

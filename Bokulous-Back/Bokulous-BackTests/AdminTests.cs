@@ -118,7 +118,7 @@ namespace Bokulous_Back.Tests
         [InlineData(null, StatusCodes.Status404NotFound)]
         public async void FindUsersByKeywordWhereKeywordIsNullOrEmptyReturnsStatusCode404(string keyword, object expectedResult)
         {
-            var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
             var actionResult = await AdminController.FindUser(keyword, admin.Id, admin.Password);
             var notFoundObject = actionResult.Result as ObjectResult;
             Assert.Equal(expectedResult, notFoundObject.StatusCode);
@@ -128,13 +128,12 @@ namespace Bokulous_Back.Tests
         [InlineData("Lasse", StatusCodes.Status403Forbidden)]
         public async void FindUsersByKeywordWhereUserIsNotAdminReturnsStatusCode403(string keyword, int expectedResult)
         {
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER2");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER2");
             var actionResult = await AdminController.FindUser(keyword, user.Id, user.Password);
             var forbidObject = actionResult.Result as StatusCodeResult;        
             Assert.Equal(expectedResult, forbidObject.StatusCode);
         }
 
-        public void Dispose()
         [Fact()]
         public async Task SetAmountTest()
         {

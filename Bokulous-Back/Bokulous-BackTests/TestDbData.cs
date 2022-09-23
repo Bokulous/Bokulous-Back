@@ -23,6 +23,7 @@ namespace Bokulous_BackTests
             Users = new();
             Books = new();
             Categories = new();
+
         }
 
         private void AddUsers()
@@ -96,6 +97,10 @@ namespace Bokulous_BackTests
             Categories.Add(new Category()
             {
                 Name = "Skräck TEST"
+            });
+            Categories.Add(new Category()
+            {
+                Name = "Barnförbjudet TEST"
             });
         }
 

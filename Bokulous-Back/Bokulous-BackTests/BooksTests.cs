@@ -3,16 +3,12 @@ using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using BookStoreApi.Controllers;
-using System.Diagnostics;
 using Xunit;
-using System.Threading.Tasks;
 using Bokulous_BackTests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
-using Xunit.Sdk;
 
 namespace Bokulous_Back.Tests
 {
@@ -22,14 +18,16 @@ namespace Bokulous_Back.Tests
         private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
+        private BookHelpers BookHelpers;
         private AdminController AdminController;
         private UsersController UsersController;
         private BooksController BooksController;
-        private TestDbData TestData;
+        private TestDbData TestData;        
 
         public BooksTests()
         {
             UserHelpers = new(dbService);
+            BookHelpers = new(dbService);
             AdminController = new(dbService);
             UsersController = new(dbService);
             BooksController = new(dbService);
@@ -128,8 +126,8 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public async void UpdateCategoryReturns200()
         {
-            var category = TestCategories.FirstOrDefault(x => x.Name == "test_pornografi");
-            var actionResult = await BooksController.UpdateCategory(category, "test_barnförbjudet");
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Barnförbjudet TEST");
+            var actionResult = await BooksController.UpdateCategory(category, "Barnbok TEST");
             var statusCodeResult = actionResult as StatusCodeResult;
             Assert.True(statusCodeResult.StatusCode == 200);
         }
@@ -139,7 +137,7 @@ namespace Bokulous_Back.Tests
         [InlineData("", StatusCodes.Status400BadRequest)]
         public async void UpdateCategoryWhereCategoryNameIsNullOrEmptyReturns400(string categoryName, int expectedResult)
         {
-            var category = TestCategories.FirstOrDefault(x => x.Name == "test_pornografi");
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Barnförbjudet TEST");
             var actionResult = await BooksController.UpdateCategory(category, categoryName);
             var statusCodeResult = actionResult as StatusCodeResult;
             Assert.Equal(expectedResult, statusCodeResult.StatusCode);
@@ -198,11 +196,10 @@ namespace Bokulous_Back.Tests
             Assert.True(statusCodeResult.StatusCode == 400);
         }
 
-        //tar bort kategori och sätter boken med bara en kategori till "Unsorted"
         [Fact()]
-        public async void DeleteCategory()
+        public async void DeleteCategoryFromBooksAndCollection()
         {
-            var category = TestCategories.FirstOrDefault(x => x.Name == "test_pornografi");
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Barnförbjudet TEST");
             var actionResult = await BooksController.DeleteCategory(category);
             var statusCodeResult = actionResult as StatusCodeResult;
             Assert.True(statusCodeResult.StatusCode == 200);
@@ -222,6 +219,35 @@ namespace Bokulous_Back.Tests
         }
 
         //Testa BookHelper.RemoveCategoryFromBooks
+        [Fact()]
+        public async void RemoveCategoryFromBooksWhereListIsEmptyReturns400()
+        {
+            var emptyList = new List<Book>();
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Fakta TEST");
+            var result = await BookHelpers.RemoveCategoryFromBooks(emptyList, category);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void RemoveCategoryFromBooksWhereListIsNullReturns400()
+        {
+            List<Book> nullList = new();
+            nullList = null;
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Fakta TEST");
+            var result = await BookHelpers.RemoveCategoryFromBooks(nullList, category);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void RemoveCategoryFromBooksWhereCategoryIsNullReturns400()
+        {
+            Category category = null;
+            var result = await BookHelpers.RemoveCategoryFromBooks(TestData.Books, category);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
 
         public void Dispose()
         {

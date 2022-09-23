@@ -17,7 +17,7 @@ namespace Bokulous_Back.Helpers
 
         public async Task<ActionResult> RemoveCategoryFromBooks(List<Book> books, Category category)
         {
-            if(books.Count == 0 || books is null || category is null)
+            if(books is null || books.Count == 0 || category is null)
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);
 
             foreach (var book in books)
