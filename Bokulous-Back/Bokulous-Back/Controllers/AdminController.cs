@@ -123,7 +123,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
-        [HttpDelete("SetAmount")]
+        [HttpPut("SetAmount")]
         public async Task<IActionResult> SetAmount(int amount, string bookId, string? adminId, string password)
         {
             var admin = await _bokulousDbService.GetUserAsync(adminId);
