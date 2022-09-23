@@ -6,6 +6,8 @@ using BookStoreApi.Controllers;
 using System.Diagnostics;
 using Xunit;
 using System.Threading.Tasks;
+using Bokulous_BackTests;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -20,153 +22,66 @@ namespace Bokulous_Back.Tests
         private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
-        private BooksController BooksController;
+        private AdminController AdminController;
         private UsersController UsersController;
-        public List<User?> TestUsers { get; set; }
-        public User? TestAdmin { get; set; }
-        public List<Book?> TestBooks { get; set; }
-        public List<Category?> TestCategories;
+        private BooksController BooksController;
+        private TestDbData TestData;
 
         public BooksTests()
         {
             UserHelpers = new(dbService);
+            AdminController = new(dbService);
             UsersController = new(dbService);
             BooksController = new(dbService);
-            TestUsers = new();
-            TestBooks = new();
+            TestData = new(dbService);
 
-            TestUsers.Add(new User()
-            {
-                IsActive = true,
-                IsAdmin = true,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla1@bla.com",
-                Password = "hej123",
-                Previous_Orders = new UserBooks[0],
-                Username = "TEST_ADMIN"
-            });
-
-            TestUsers.Add(new User()
-            {
-                IsActive = true,
-                IsAdmin = false,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla2@bla.com",
-                Password = "hej123",
-                Previous_Orders = new UserBooks[0],
-                Username = "TEST_USER1"
-            });
-
-            TestUsers.Add(new User()
-            {
-                IsActive = true,
-                IsAdmin = false,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla3@bla.com",
-                Password = "hej123",
-                Previous_Orders = new UserBooks[0],
-                Username = "TEST_USER2"
-            });
-
-            TestBooks.Add(new Book()
-            {
-                ISBN = "12345",
-                Title = "TEST",
-                Categories = new string[] { "Skräck", "test_pornografi" },
-                Language = "Svenska",
-                Authors = new string[] { "Testy Testersson" },
-                Published = 2022,
-                Weight = 300,
-                IsUsed = false,
-                InStorage = 5,
-                Price = 100,
-                Seller = null,
-                BookCover = default
-            });
-
-            TestBooks.Add(new Book()
-            {
-                ISBN = "22222",
-                Title = "TEST_CATEGORY",
-                Categories = new string[] { "test_pornografi" },
-                Language = "Svenska",
-                Authors = new string[] { "Testy Testersson" },
-                Published = 2022,
-                Weight = 300,
-                IsUsed = false,
-                InStorage = 5,
-                Price = 100,
-                Seller = null,
-                BookCover = default
-            });
-
-            TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-            TestBooks.ForEach(async (book) => await dbService.CreateBookAsync(book));
-            Thread.Sleep(1000);
-            TestUsers = dbService.GetUserAsync().Result;
-            TestUsers = dbService.GetUserAsync().Result;
-            TestBooks = dbService.GetBookAsync().Result;
-
-            TestCategories = new();
-
-            TestCategories.Add(new Category { Name = "test_pornografi" });
-            TestCategories.Add(new Category { Name = "test_romantik" });
-            TestCategories.Add(new Category { Name = "test_rysare" });
-            TestCategories.Add(new Category { Name = "test_humor" });
-            TestCategories.Add(new Category { Name = "test_historia" });
-            TestCategories.Add(new Category { Name = "test_skönlitteratur" });
-            TestCategories.Add(new Category { Name = "test_litteraturvetenskap" });
-            TestCategories.Add(new Category { Name = "test_deckare" });
-            TestCategories.Add(new Category { Name = "test_barnbok" });
-
-            TestCategories.ForEach(async (category) => await dbService.CreateCategoryAsync(category));
-            TestCategories = dbService.GetCategoryAsync().Result;
+            TestData.AddDataToDb();
         }
 
         [Fact()]
-        public void BuyBook_Pass()
+        public async Task BuyBook_Pass()
         {
             //arrange
-            var buyer = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var buyer = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
 
-            var seller = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER2");
+            var seller = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER2");
 
-            var book = TestBooks.FirstOrDefault(x => x.Title == "TEST");
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
 
-            BookUser bookUser = new()
+            book.Seller = new()
             {
                 Id = seller.Id,
                 Mail = seller.Mail,
                 Username = seller.Username
             };
-            book.Seller = bookUser;
 
-            dbService.UpdateBookAsync(book.Id, book);
+            await dbService.UpdateBookAsync(book.Id, book);
+            Thread.Sleep(1000);
 
             //act
-            var response = BooksController.BuyBook(book.Id, buyer.Id, buyer.Password).Result as Microsoft.AspNetCore.Mvc.StatusCodeResult;
+            var response = (await BooksController.BuyBook(book.Id, buyer.Id, buyer.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response.StatusCode;
             //StatusCodeResult = hämtar statuskoden
 
             //assert
-            Assert.True(response.StatusCode == 200);
+            Assert.Equal(expected, actual);
         }
 
         [Fact()]
-        private void GetBooksByAuthor_Pass()
+        public async Task GetBooksByAuthor_Pass()
         {
             //arrange
             var keyword = "Ekwurtzel";
 
             //act
-            var response = BooksController.GetBooksByAuthor(keyword).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
-            var value = response.Value as List<Book>;
+            var response = (await BooksController.GetBooksByAuthor(keyword)) as ObjectResult;
+            //var value = response as List<Book>;
             //ObjectResult = hämtar hela objektet
 
             //assert
-            Assert.True(value.Count > 0);
+            Assert.True(response.StatusCode == 200);
         }
 
         [Theory]
@@ -310,42 +225,7 @@ namespace Bokulous_Back.Tests
 
         public void Dispose()
         {
-            TestUsers = dbService.GetUserAsync().Result;
-
-            TestUsers.ForEach(async (user) =>
-            {
-                if (user.Username == "TEST_ADMIN")
-                {
-                    await dbService.RemoveUserAsync(user.Id);
-                    TestAdmin = null;
-                    Debug.WriteLine("Removing admin: " + user?.Username);
-                }
-                else if (user.Username.Contains("TEST_"))
-                {
-                    await dbService.RemoveUserAsync(user.Id);
-                    Debug.WriteLine("Removing user: " + user?.Username);
-                }
-            });
-
-            TestBooks = dbService.GetBookAsync().Result;
-
-            TestBooks.ForEach(async (book) =>
-            {
-                if (book.Title.Contains("TEST"))
-                {
-                    await dbService.RemoveBookAsync(book.Id);
-                }
-            });
-
-            TestCategories = dbService.GetCategoryAsync().Result;
-
-            TestCategories.ForEach(async (category) =>
-            {
-                if (category.Name.Contains("test"))
-                {
-                    await dbService.RemoveCategoryAsync(category.Id);
-                }
-            });
+            TestData.RemoveDataFromDb();
         }
     }
 }

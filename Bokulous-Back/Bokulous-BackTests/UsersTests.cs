@@ -2,6 +2,8 @@
 using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
+using Bokulous_BackTests;
+using BookStoreApi.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Newtonsoft.Json;
@@ -13,75 +15,34 @@ namespace Bokulous_Back.Tests
     [Collection("Sequential")]
     public class UsersTests : IDisposable
     {
-        private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
+
+        BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
+        private AdminController AdminController;
         private UsersController UsersController;
+        private BooksController BooksController;
+        private TestDbData TestData;
         public List<User?> TestUsers { get; set; }
         public User? TestAdmin { get; set; }
         public User userDontExist;
 
+
         public UsersTests()
         {
             UserHelpers = new(dbService);
+            AdminController = new(dbService);
             UsersController = new(dbService);
+            BooksController = new(dbService);
+            TestData = new(dbService);
 
-            TestUsers = new();
-
-            //Test admin
-            TestUsers.Add(new User()
-            {
-                IsActive = true,
-                IsAdmin = true,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla1@bla.com",
-                Password = "hej123",
-                Previous_Orders = new UserBooks[0],
-                Username = "TEST_ADMIN"
-            });
-
-            //Test user
-            TestUsers.Add(new User()
-            {
-                IsActive = true,
-                IsAdmin = false,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla2@bla.com",
-                Password = "hej123",
-                Previous_Orders = new UserBooks[0],
-                Username = "TEST_USER1"
-            });
-
-            //Test user
-            TestUsers.Add(new User()
-            {
-                IsActive = true,
-                IsAdmin = false,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla3@bla.com",
-                Password = "hej123",
-                Previous_Orders = new UserBooks[0],
-                Username = "TEST_USER2"
-            });
-
-            //Adding test users to database
-            TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-            Thread.Sleep(1000);
-            TestUsers = dbService.GetUserAsync().Result;
-
-            userDontExist = new User
-            {
-                Id = "123456789123456789123456",
-            };
+            TestData.AddDataToDb();
         }
 
         [Fact()]
         public async Task ShowProfileTest()
         {
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
 
             user.Password = "";
 
@@ -93,30 +54,28 @@ namespace Bokulous_Back.Tests
             Assert.Equal(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(actual));
         }
 
-        //FEL VID MERGE?
+        [Fact()]
+        public void LoginTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
 
-        //[Fact()]
-        //public void LoginTest()
-        //{
-        //    var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            user.Password = "hej123";
 
-        //    user.Password = "hej123";
+            var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.OkObjectResult;
 
-        //    var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.OkObjectResult;
+            Assert.True(response.StatusCode == 200);
+        }
+        [Fact()]
+        public void LoginWrongPasswordTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
 
-        //    Assert.True(response.StatusCode == 200);
-        //}
-        //[Fact()]
-        //public void LoginWrongPasswordTest()
-        //{
-        //    var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            user.Password = "hej125";
 
-        //    user.Password = "hej125";
+            var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.NotFoundObjectResult;
 
-        //    var response = UsersController.Login(user).Result as Microsoft.AspNetCore.Mvc.NotFoundObjectResult;
-
-        //    Assert.False(response.StatusCode == 200);
-        //}
+            Assert.False(response.StatusCode == 200);
+        }
 
         [Fact()]
         public void RegisterTest()
@@ -129,10 +88,10 @@ namespace Bokulous_Back.Tests
                 IsSeller = false,
                 Mail = "bla6@bla.com",
                 Password = "hej1234",
-                Previous_Orders = new UserBooks[0],
+                Previous_Orders = new List<UserBooks>(),
                 Username = "TEST_USER3"
             };
-            TestUsers.Add(user);
+            TestData.Users.Add(user);
 
             var response = UsersController.Register(user).Result as Microsoft.AspNetCore.Mvc.StatusCodeResult;
 
@@ -143,7 +102,7 @@ namespace Bokulous_Back.Tests
         public void EditProfilePass()
         {
             //arrange
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
 
             var password = user.Password;
 
@@ -187,31 +146,7 @@ namespace Bokulous_Back.Tests
         }
         public void Dispose()
         {
-            TestUsers = dbService.GetUserAsync().Result;
-
-            TestUsers.ForEach(async (user) =>
-            {
-                if (user.Username == "TEST_ADMIN")
-                {
-                    await dbService.RemoveUserAsync(user.Id);
-                    TestAdmin = null;
-                    Debug.WriteLine("Removing admin: " + user?.Username);
-                }
-                else if (user.Username.Contains("TEST_"))
-                {
-                    await dbService.RemoveUserAsync(user.Id);
-                    Debug.WriteLine("Removing user: " + user?.Username);
-                }
-            });
-
-            var TestBooks = dbService.GetBookAsync().Result;
-            TestBooks.ForEach(async (book) =>
-            {
-                if (book.Title.Contains("TEST"))
-                {
-                    await dbService.RemoveBookAsync(book.Id);
-                }
-            });
+            TestData.RemoveDataFromDb();
         }
     }
 }
