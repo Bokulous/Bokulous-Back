@@ -79,12 +79,12 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("BuyBook/{bookId:length(24)}")]
-    public async Task<IActionResult> BuyBook(string bookId, string buyerId, string password)
+    [HttpPut("BuyBook")]
+    public async Task<ActionResult> BuyBook(string bookId, string buyerId, string password)
     {
         var book = await _bokulousDbService.GetBookAsync(bookId);
         var buyer = await _bokulousDbService.GetUserAsync(buyerId);
-
+        
         if (buyer is null)
             return NotFound("Buyer not found");
 
@@ -92,20 +92,20 @@ public class BooksController : ControllerBase
             return NotFound("Book not found");
 
         if (buyer.Password != password)
-            return Forbid("Big nono");
+            return new StatusCodeResult(StatusCodes.Status403Forbidden);
 
         if (book.Seller.Id == buyerId)
             return BadRequest("Seller = Buyer");
 
         if (book.InStorage < 1)
             return BadRequest("0 books in storage");
-
+        
         book.InStorage--;
         await _bokulousDbService.UpdateBookAsync(book.Id, book);
         // TODO: add method for sending mock-emails :)
         // maila orderbekräftelse till köpare
         // ev. maila till säljare(admin eller säljare av begagnad bok)
-
+        
         return Ok();
     }
 

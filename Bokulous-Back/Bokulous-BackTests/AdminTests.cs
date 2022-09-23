@@ -1,8 +1,14 @@
-﻿using Bokulous_Back.Controllers;
+using Bokulous_Back.Controllers;
 using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
+using Bokulous_BackTests;
+using BookStoreApi.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Bokulous_Back.Helpers;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 namespace Bokulous_Back.Tests
@@ -16,66 +22,18 @@ namespace Bokulous_Back.Tests
         private UserHelpers UserHelpers;
         private AdminController AdminController;
         private UsersController UsersController;
-        public List<User?> TestUsers { get; set; }
-        public User? TestAdmin { get; set; }
+        private BooksController BooksController;
+        private TestDbData TestData;
 
         public AdminTests()
         {
             UserHelpers = new(dbService);
             AdminController = new(dbService);
             UsersController = new(dbService);
+            BooksController = new(dbService);
+            TestData = new(dbService);
 
-            TestUsers = new();
-
-            //Test admin
-            TestUsers.Add(new User()
-            {
-                IsActive = true,
-                IsAdmin = true,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla1@bla.com",
-                Password = "hej123",
-                Previous_Orders = new UserBooks[0],
-                Username = "TEST_ADMIN"
-            });
-
-            //Test user
-            TestUsers.Add(new User()
-            {
-                IsActive = true,
-                IsAdmin = false,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla2@bla.com",
-                Password = "hej123",
-                Previous_Orders = new UserBooks[0],
-                Username = "TEST_USER1"
-            });
-
-            //Test user
-            TestUsers.Add(new User()
-            {
-                IsActive = true,
-                IsAdmin = false,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla3@bla.com",
-                Password = "hej123",
-                Previous_Orders = new UserBooks[0],
-                Username = "TEST_USER2"
-            });
-
-            //Adding test users to database
-            TestUsers.ForEach(async (user) => await dbService.CreateUserAsync(user));
-            Thread.Sleep(1000);
-            TestUsers = dbService.GetUserAsync().Result;
-        }
-
-        [Fact()]
-        public void TestMethodTest()
-        {
-            Assert.True(true, "This test needs an implementati");
+            TestData.AddDataToDb();
         }
 
         [Fact()]
@@ -94,7 +52,7 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public async Task CheckIsNotAdminTest()
         {
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
 
             var expected = false;
 
@@ -108,8 +66,8 @@ namespace Bokulous_Back.Tests
         {
             const string NEW_PASS = "testpass123";
 
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
-            var admin = TestUsers.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
 
             await AdminController.ChangeUserPass(user.Id, NEW_PASS, admin.Id, admin.Password);
 
@@ -119,34 +77,139 @@ namespace Bokulous_Back.Tests
 
             Assert.Equal(expected, actual);
         }
+        
+        [Fact()]
+        public async Task PurgeBookTest()
+        {
+            var book = TestData.Books.First();
+            var admin = TestData.Users.FirstOrDefault(admin => admin.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.PurgeBook(book.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task PurgeEmptyBooksTest()
+        {
+            var books = TestData.Books.ToList();
+            var admin = TestData.Users.FirstOrDefault(admin => admin.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.PurgeEmptyBooks(admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task SetAmountTest()
+        {
+            const int SET_BOOK_INSTORAGE = 5;
+
+            var book = TestData.Books.FirstOrDefault();
+            var admin = TestData.Users.FirstOrDefault(admin => admin.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.SetAmount(SET_BOOK_INSTORAGE, book.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task InactivateSellerTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.InactivateUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task ListUsers()
+        {
+            var users = TestData.Users.ToList();
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.ListUsers(admin.Id, admin.Password)).Result as ObjectResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task BlockUserTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.BlockUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task UnBlockUserTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.UnblockUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task DemoteTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.Demote(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task PromoteTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.Promote(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
 
         public void Dispose()
         {
-            TestUsers = dbService.GetUserAsync().Result;
-
-            TestUsers.ForEach(async (user) =>
-            {
-                if (user.Username == "TEST_ADMIN")
-                {
-                    await dbService.RemoveUserAsync(user.Id);
-                    TestAdmin = null;
-                    Debug.WriteLine("Removing admin: " + user?.Username);
-                }
-                else if (user.Username.Contains("TEST_"))
-                {
-                    await dbService.RemoveUserAsync(user.Id);
-                    Debug.WriteLine("Removing user: " + user?.Username);
-                }
-            });
-
-            var TestBooks = dbService.GetBookAsync().Result;
-            TestBooks.ForEach(async (book) =>
-            {
-                if (book.Title.Contains("TEST"))
-                {
-                    await dbService.RemoveBookAsync(book.Id);
-                }
-            });
+            TestData.RemoveDataFromDb();
         }
     }
 }
