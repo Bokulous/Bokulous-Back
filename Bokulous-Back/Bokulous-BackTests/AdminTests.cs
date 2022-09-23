@@ -170,13 +170,42 @@ namespace Bokulous_Back.Tests
             var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
             var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
 
-            var response = (await AdminController.UnBlockUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+            var response = (await AdminController.UnblockUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
 
             var expected = 200;
             var actual = response?.StatusCode ?? throw new Exception("reponse was null");
 
             Assert.Equal(expected, actual);
         }
+
+        [Fact()]
+        public async Task DemoteTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.Demote(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact()]
+        public async Task PromoteTest()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.Promote(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
 
         public void Dispose()
         {
