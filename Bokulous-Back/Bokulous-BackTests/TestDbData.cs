@@ -35,7 +35,7 @@ namespace Bokulous_BackTests
                 IsSeller = false,
                 Mail = "bla1@bla.com",
                 Password = "hej123",
-                Previous_Orders = new UserBooks[0],
+                Previous_Orders = new List<UserBooks>(),
                 Username = "TEST_ADMIN"
             });
 
@@ -47,7 +47,7 @@ namespace Bokulous_BackTests
                 IsSeller = false,
                 Mail = "bla2@bla.com",
                 Password = "hej123",
-                Previous_Orders = new UserBooks[0],
+                Previous_Orders = new List<UserBooks>(),
                 Username = "TEST_USER1"
             });
 
@@ -59,7 +59,7 @@ namespace Bokulous_BackTests
                 IsSeller = false,
                 Mail = "bla3@bla.com",
                 Password = "hej123",
-                Previous_Orders = new UserBooks[0],
+                Previous_Orders = new List<UserBooks>(),
                 Username = "TEST_USER2"
             });
         }

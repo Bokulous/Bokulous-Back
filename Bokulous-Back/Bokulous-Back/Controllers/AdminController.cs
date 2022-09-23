@@ -268,5 +268,31 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
+
+        [HttpPost("BestCustomer")]
+        public async Task<ActionResult<User>> BestCustomer(string adminId, string password)
+        {
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+
+            if (admin is null)
+                return NotFound("Admin could not be found");
+
+            if (!await UserHelpers.CheckIsAdmin(adminId, password))
+                return Forbid("Failed admin check");
+
+            var users = (await _bokulousDbService.GetUserAsync());
+            var orders = new List<dynamic>();
+
+            foreach (var user in users)
+            {
+                orders.Add(new {User = user, Sum = user.Previous_Orders.Sum(order => order.Price) });
+            }
+
+            var result = orders.Select(order => new {User = (User)order.User, Sum = (double)order.Sum }).MaxBy(order => order.Sum);
+
+            Console.WriteLine(result.User);
+
+            return Ok(result.User);
+        }
     }
 }
