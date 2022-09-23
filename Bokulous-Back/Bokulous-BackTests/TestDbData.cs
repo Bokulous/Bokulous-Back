@@ -71,7 +71,7 @@ namespace Bokulous_BackTests
             {
                 ISBN = "12345",
                 Title = "TEST",
-                Categories = new string[] { "Skräck" },
+                Categories = new string[] { "Skräck TEST" },
                 Language = "Svenska",
                 Authors = new string[] { "Testy Testersson" },
                 Published = 2022,

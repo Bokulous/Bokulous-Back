@@ -3,6 +3,7 @@ using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Bokulous_Back.Helpers
 {
@@ -23,6 +24,7 @@ namespace Bokulous_Back.Helpers
             foreach (var book in books)
             {
                 book.Categories = book.Categories.Where(x => x != category.Name).ToArray();
+                book.Categories = book.Categories.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
                 if (book.Categories.Length == 0)
                     book.Categories = new List<string>(book.Categories) { "Unsorted" }.ToArray();

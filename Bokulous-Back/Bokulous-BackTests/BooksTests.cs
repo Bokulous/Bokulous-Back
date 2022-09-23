@@ -248,6 +248,48 @@ namespace Bokulous_Back.Tests
             Assert.True(statusCodeResult.StatusCode == 400);
         }
 
+        [Fact()]
+        public async void AddBookToCategoryWhereBookIsNullReturns400()
+        {
+            var book = new Book();
+            book = null;
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Skräck TEST");
+            var result = await BooksController.AddBookToCategory(book, category);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void AddBookToCategoryWhereCategoryIsNullReturns400()
+        {
+            var category = new Category();
+            category = null;
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var result = await BooksController.AddBookToCategory(book, category);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void AddBookToCategoryReturns200()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Fakta TEST");
+            var result = await BooksController.AddBookToCategory(book, category);
+            var statusCodeResult = result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Fact()]
+        public async void AddBookToCategoryWhereCategoryExistsReturns400()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Skräck TEST");
+            var result = await BooksController.AddBookToCategory(book, category);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
         public void Dispose()
         {
             TestData.RemoveDataFromDb();
