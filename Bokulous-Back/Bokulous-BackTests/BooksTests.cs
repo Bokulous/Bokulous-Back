@@ -1,13 +1,10 @@
 ﻿using Bokulous_Back.Controllers;
 using Bokulous_Back.Helpers;
-using Bokulous_Back.Models;
 using Bokulous_Back.Services;
-using BookStoreApi.Controllers;
-using System.Diagnostics;
-using Xunit;
-using System.Threading.Tasks;
 using Bokulous_BackTests;
+using BookStoreApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Xunit;
 
 namespace Bokulous_Back.Tests
 {
@@ -65,18 +62,11 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public async Task GetBooksByAuthor_Pass()
+        public async void GetBooksByAuthor_Pass()
         {
-            //arrange
-            var keyword = "Ekwurtzel";
-
-            //act
-            var response = (await BooksController.GetBooksByAuthor(keyword)) as ObjectResult;
-            //var value = response as List<Book>;
-            //ObjectResult = hämtar hela objektet
-
-            //assert
-            Assert.True(response.StatusCode == 200);
+            var actionResult = await BooksController.GetBooksByAuthor("Testersson");
+            var statusCodeResult = actionResult.Result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
         }
 
         public void Dispose()

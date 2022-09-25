@@ -1,7 +1,6 @@
 ﻿using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bokulous_Back.Controllers
@@ -16,7 +15,7 @@ namespace Bokulous_Back.Controllers
         public UsersController(BokulousDbService bokulousDbService)
         {
             _bokulousDbService = bokulousDbService;
-            userHelper = new (_bokulousDbService);
+            userHelper = new(_bokulousDbService);
         }
 
         [HttpGet("GetUsers")]
@@ -51,7 +50,7 @@ namespace Bokulous_Back.Controllers
 
         [HttpPost("Register")]
         public async Task<ActionResult> Register(User newUser)
-        { 
+        {
             if (!userHelper.CheckIsUsernameValid(newUser.Username))
                 return BadRequest("Username is not valid");
 
@@ -75,7 +74,8 @@ namespace Bokulous_Back.Controllers
 
             return Ok(profile);
         }
-        [HttpPost ("Login")]
+
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] User userLogin)
         {
             var user = await _bokulousDbService.LoginAsync(userLogin);

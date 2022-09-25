@@ -1,16 +1,11 @@
 ﻿using Bokulous_Back.Models;
 using Bokulous_Back.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bokulous_BackTests
 {
     internal class TestDbData
     {
-        BokulousDbService _dbService;
+        private BokulousDbService _dbService;
 
         public List<User> Users { get; set; }
         public List<Book> Books { get; set; }

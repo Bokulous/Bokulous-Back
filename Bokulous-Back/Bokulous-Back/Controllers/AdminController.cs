@@ -39,7 +39,7 @@ namespace Bokulous_Back.Controllers
 
             var check = await _bokulousDbService.GetUserAsync(userId);
 
-            if(check.IsActive)
+            if (check.IsActive)
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
 
             return Ok();
@@ -88,6 +88,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
+
         [HttpDelete("PurgeEmptyBooks")]
         public async Task<IActionResult> PurgeEmptyBooks(string adminId, string password)
         {
@@ -118,11 +119,12 @@ namespace Bokulous_Back.Controllers
                     removedAll = true;
             });
 
-            if(!removedAll)
+            if (!removedAll)
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
 
             return Ok();
         }
+
         [HttpPut("SetAmount")]
         public async Task<IActionResult> SetAmount(int amount, string bookId, string? adminId, string password)
         {
@@ -147,6 +149,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
+
         [HttpPost("ListUsers")]
         public async Task<ActionResult<List<User>>> ListUsers(string adminId, string password)
         {
@@ -162,6 +165,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok(users);
         }
+
         [HttpPut("BlockUser")]
         public async Task<ActionResult> BlockUser(string userId, string adminId, string password)
         {
@@ -188,6 +192,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok();
         }
+
         [HttpPut("UnblockUser")]
         public async Task<ActionResult> UnblockUser(string userId, string adminId, string password)
         {
@@ -285,10 +290,10 @@ namespace Bokulous_Back.Controllers
 
             foreach (var user in users)
             {
-                orders.Add(new {User = user, Sum = user.Previous_Orders.Sum(order => order.Price) });
+                orders.Add(new { User = user, Sum = user.Previous_Orders.Sum(order => order.Price) });
             }
 
-            var result = orders.Select(order => new {User = (User)order.User, Sum = (double)order.Sum }).MaxBy(order => order.Sum);
+            var result = orders.Select(order => new { User = (User)order.User, Sum = (double)order.Sum }).MaxBy(order => order.Sum);
 
             Console.WriteLine(result.User);
 
