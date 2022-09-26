@@ -68,6 +68,115 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
+        public async void GetBooksReturns200()
+        {
+            var result = await BooksController.GetBooks();
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Fact()]
+        public async void GetBookReturns200()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var result = await BooksController.GetBook(book.Id);
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Theory]
+        [InlineData("", StatusCodes.Status400BadRequest)]
+        [InlineData(null, StatusCodes.Status400BadRequest)]
+        public async void GetBookWhereIdIsNullOrEmptyReturns400(string id, int expectedResult)
+        {
+            var result = await BooksController.GetBook(id);
+            var statusCodeResult = result.Result as StatusCodeResult;
+            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
+        }
+
+        [Fact()]
+        public async void GetBookWhereBookDontExistReturns404()
+        {
+            var book = new Book()
+            {
+                Id = "111111111111111111111111"
+            };
+            var result = await BooksController.GetBook(book.Id);
+            var statusCodeResult = result.Result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 404);
+        }
+
+        [Fact()]
+        public async void AddBookReturns201()
+        {
+            var result = await BooksController.AddBook(TestData.book);
+            var statusCodeResult = result as CreatedAtActionResult;
+            Assert.True(statusCodeResult.StatusCode == 201);
+        }
+
+        [Fact()]
+        public async void AddBookToStorageReturns200()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST 3" && x.Seller.Username == "Sarah");
+            var response = await BooksController.AddBook(book);
+            var result = response as ObjectResult;
+            var obj = (Book)result.Value;
+            Assert.Equal(obj.InStorage, 5);
+        }
+
+        [Fact()]
+        public async void AddBookWhereBookIsNullReturns400()
+        {
+            var book = new Book();
+            book = null;
+            var result = await BooksController.AddBook(book);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void AddBookToCategoryWhereBookIsNullReturns400()
+        {
+            var book = new Book();
+            book = null;
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Skräck TEST");
+            var result = await BooksController.AddBookToCategory(book, category);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void AddBookToCategoryWhereCategoryIsNullReturns400()
+        {
+            var category = new Category();
+            category = null;
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var result = await BooksController.AddBookToCategory(book, category);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void AddBookToCategoryReturns200()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Fakta TEST");
+            var result = await BooksController.AddBookToCategory(book, category);
+            var statusCodeResult = result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Fact()]
+        public async void AddBookToCategoryWhereCategoryExistsReturns400()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Skräck TEST");
+            var result = await BooksController.AddBookToCategory(book, category);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
         public async Task GetBooksByAuthor_Pass()
         {
             //arrange
@@ -80,6 +189,85 @@ namespace Bokulous_Back.Tests
 
             //assert
             Assert.True(response.StatusCode == 200);
+        }
+
+        [Fact()]
+        public async void UpdateBookWhereUpdatedBookIsNullReturns400()
+        {
+            var updatedBook = new Book();
+            updatedBook = null;
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var result = await BooksController.UpdateBook(book.Id, updatedBook);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async void UpdateBookWhereIdIsNullOrEmptyReturns400(string id)
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var result = await BooksController.UpdateBook(id, book);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void UpdateBookWhereBookIdDontExistsReturns404()
+        {
+            string id = "111111111111111111111111";
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var result = await BooksController.UpdateBook(id, book);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 404);
+        }
+
+        [Fact()]
+        public async void UpdateBookReturns200()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var result = await BooksController.UpdateBook(book.Id, book);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async void DeleteBookWhereIdIsNullOrEmptyReturns400(string id)
+        {
+            var result = await BooksController.DeleteBook(id);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void DeleteBookWhereBookIdDontExistsReturns404()
+        {
+            string id = "111111111111111111111111";
+            var result = await BooksController.DeleteBook(id);
+            var statusCodeResult = result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 404);
+        }
+
+        [Fact()]
+        public async void DeleteBookReturns200()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST 2");
+            var result = await BooksController.DeleteBook(book.Id);
+            var statusCodeResult = (IStatusCodeActionResult)result;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Fact()]
+        public async void DeleteBookFromStorageReturns200()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
+            var response = await BooksController.DeleteBook(book.Id);           
+            var result = response as ObjectResult;
+            var obj = (Book)result.Value;
+            Assert.Equal(obj.InStorage, 4);
         }
 
         [Theory]
@@ -172,7 +360,7 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public async void GetBooksByCategoryReturns200AndList()
         {
-            var actionResult = await BooksController.GetBooksByCategory("Skräck");
+            var actionResult = await BooksController.GetBooksByCategory("Skräck TEST");
             var statusCodeResult = actionResult.Result as ObjectResult;
             Assert.True(statusCodeResult.StatusCode == 200);
         }
@@ -244,48 +432,6 @@ namespace Bokulous_Back.Tests
         {
             Category category = null;
             var result = await BookHelpers.RemoveCategoryFromBooks(TestData.Books, category);
-            var statusCodeResult = result as StatusCodeResult;
-            Assert.True(statusCodeResult.StatusCode == 400);
-        }
-
-        [Fact()]
-        public async void AddBookToCategoryWhereBookIsNullReturns400()
-        {
-            var book = new Book();
-            book = null;
-            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Skräck TEST");
-            var result = await BooksController.AddBookToCategory(book, category);
-            var statusCodeResult = result as StatusCodeResult;
-            Assert.True(statusCodeResult.StatusCode == 400);
-        }
-
-        [Fact()]
-        public async void AddBookToCategoryWhereCategoryIsNullReturns400()
-        {
-            var category = new Category();
-            category = null;
-            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
-            var result = await BooksController.AddBookToCategory(book, category);
-            var statusCodeResult = result as StatusCodeResult;
-            Assert.True(statusCodeResult.StatusCode == 400);
-        }
-
-        [Fact()]
-        public async void AddBookToCategoryReturns200()
-        {
-            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
-            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Fakta TEST");
-            var result = await BooksController.AddBookToCategory(book, category);
-            var statusCodeResult = result as ObjectResult;
-            Assert.True(statusCodeResult.StatusCode == 200);
-        }
-
-        [Fact()]
-        public async void AddBookToCategoryWhereCategoryExistsReturns400()
-        {
-            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST");
-            var category = TestData.Categories.FirstOrDefault(x => x.Name == "Skräck TEST");
-            var result = await BooksController.AddBookToCategory(book, category);
             var statusCodeResult = result as StatusCodeResult;
             Assert.True(statusCodeResult.StatusCode == 400);
         }

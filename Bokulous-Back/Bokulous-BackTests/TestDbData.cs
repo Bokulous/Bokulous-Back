@@ -15,6 +15,7 @@ namespace Bokulous_BackTests
         public List<User> Users { get; set; }
         public List<Book> Books { get; set; }
         public List<Category> Categories { get; set; }
+        public Book book { get; set; }
 
         public TestDbData(BokulousDbService dbService)
         {
@@ -79,9 +80,57 @@ namespace Bokulous_BackTests
                 IsUsed = false,
                 InStorage = 5,
                 Price = 100,
-                Seller = null,
+                Seller = new()
+                {
+                    Username = "Sarah"
+                },
                 BookCover = default
             });
+
+            Books.Add(new Book()
+            {
+                ISBN = "12345",
+                Title = "TEST 2",
+                Categories = new string[] { "Humor TEST" },
+                Language = "Svenska",
+                Authors = new string[] { "Testy Testersson" },
+                Published = 2022,
+                Weight = 300,
+                IsUsed = false,
+                InStorage = 2,
+                Price = 100,
+                Seller = new()
+                {
+                    Username = "Sarah"
+                },
+                BookCover = default
+            });
+
+            Books.Add(new Book()
+            {
+                ISBN = "12345",
+                Title = "TEST 3",
+                Categories = new string[] { "Fakta TEST" },
+                Language = "Svenska",
+                Authors = new string[] { "Testy Testersson" },
+                Published = 2022,
+                Weight = 300,
+                IsUsed = false,
+                InStorage = 4,
+                Price = 100,
+                Seller = new()
+                {
+                    Username = "Sarah"
+                },
+                BookCover = default
+            });
+
+            book = new Book()
+            {
+                Title = "TEST BOK",
+                InStorage = 2
+            };
+
         }
 
         private void AddCategories()

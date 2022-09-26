@@ -31,8 +31,11 @@ namespace Bokulous_Back.Controllers
         }
 
         [HttpGet("GetUser/{id:length(24)}")]
-        public async Task<ActionResult<List<User>>> GetUser(string id)
+        public async Task<ActionResult<User>> GetUser(string id)
         {
+            if (string.IsNullOrEmpty(id))
+                return NotFound();
+
             var user = await _bokulousDbService.GetUserAsync(id);
 
             if (user is null)
@@ -42,8 +45,27 @@ namespace Bokulous_Back.Controllers
         }
 
         [HttpPost("AddUser")]
-        public async Task<ActionResult> AddUser(User newUser)
+        public async Task<IActionResult> AddUser(User newUser)
         {
+            if (newUser is null)
+                return BadRequest();
+
+            var users = await _bokulousDbService.GetUserAsync();
+
+            foreach (var u in users)
+            {
+                if(u.Username == newUser.Username)
+                    return BadRequest("User with that username already exists");
+                if(u.Mail == newUser.Mail)
+                    return BadRequest("User with that email already exists");
+            }
+
+            if (!userHelper.CheckIsUsernameValid(newUser.Username))
+                return BadRequest("Username is not valid");
+            
+            if (!userHelper.CheckIsPasswordValid(newUser.Password))
+                return BadRequest("Password is not valid");
+
             await _bokulousDbService.CreateUserAsync(newUser);
 
             return Ok();

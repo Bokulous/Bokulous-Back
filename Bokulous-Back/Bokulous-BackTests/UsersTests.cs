@@ -5,6 +5,7 @@ using Bokulous_Back.Services;
 using Bokulous_BackTests;
 using BookStoreApi.Controllers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -36,6 +37,109 @@ namespace Bokulous_Back.Tests
             TestData = new(dbService);
 
             TestData.AddDataToDb();
+        }
+
+        [Fact()]
+        public async void GetUsersReturns200()
+        {
+            var result = await UsersController.GetUsers();
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Fact()]
+        public async void GetUserReturns200()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var result = await UsersController.GetUser(user.Id);
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async void GetUserWhereIdIsNullOrEmptyReturns404(string id)
+        {
+            var result = await UsersController.GetUser(id);
+            var statusCodeResult = result.Result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 404);
+        }
+
+        //INTE FÄRDIG
+        [Fact()]
+        public async void AddUserReturns200()
+        {
+            var user = new User()
+            {
+                Username = "TEST_ADDUSER",
+                Mail = "test@test.com",
+                Password = "123456"
+            };
+            var result = await UsersController.AddUser(user);
+            var statusCodeResult = (IStatusCodeActionResult)result;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Fact()]
+        public async void AddUserWhereUserIsNullReturns400()
+        {
+            var user = new User();
+            user = null;
+            var result = await UsersController.AddUser(user);
+            var statusCodeResult = (IStatusCodeActionResult)result;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void AddUserWhereUsernameExistsReturns400()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var result = await UsersController.AddUser(user);
+            var statusCodeResult = (IStatusCodeActionResult)result;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void AddUserWhereMailExistsReturns400()
+        {
+            var user = new User()
+            {
+                Username = "TEST_USER3",
+                Mail = "bla2@bla.com",
+                Password = "123456"
+            };
+            var result = await UsersController.AddUser(user);
+            var statusCodeResult = (IStatusCodeActionResult)result;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void AddUserWhereUsernameIsNotValidReturns400()
+        {
+            var user = new User()
+            {
+                Username = "",
+                Mail = "test@testmail.com",
+                Password = "123456"
+            };
+            var result = await UsersController.AddUser(user);
+            var statusCodeResult = (IStatusCodeActionResult)result;
+            Assert.True(statusCodeResult.StatusCode == 400);
+        }
+
+        [Fact()]
+        public async void AddUserWherePasswordIsNotValidExistsReturns400()
+        {
+            var user = new User()
+            {
+                Username = "TEST_USER4",
+                Mail = "hello@.com",
+                Password = ""
+            };
+            var result = await UsersController.AddUser(user);
+            var statusCodeResult = (IStatusCodeActionResult)result;
+            Assert.True(statusCodeResult.StatusCode == 400);
         }
 
         [Fact()]

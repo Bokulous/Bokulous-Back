@@ -27,6 +27,7 @@ namespace Bokulous_Back.Tests
         BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
+        private BookHelpers BookHelpers;
         private AdminController AdminController;
         private UsersController UsersController;
         private BooksController BooksController;
@@ -35,6 +36,7 @@ namespace Bokulous_Back.Tests
         public AdminTests()
         {
             UserHelpers = new(dbService);
+            BookHelpers = new(dbService);
             AdminController = new(dbService);
             UsersController = new(dbService);
             BooksController = new(dbService);
