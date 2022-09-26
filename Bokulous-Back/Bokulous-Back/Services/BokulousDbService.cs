@@ -54,8 +54,10 @@ namespace Bokulous_Back.Services
 
         public async Task<List<Book>> GetBooksAsyncByAuthor(string keyword) =>   // behöver ligga i service för att komma åt bookscollection
             await _booksCollection.Find(x => x.Authors.Any(y => y.Contains(keyword))).ToListAsync();
+
+        //Onödig?
         public async Task<List<Book>> GetBooksFilteredAsync(string title, string[] author, string[] category, double price) =>
-            await _booksCollection.Find(x => x.Title == title && x.Authors == author && x.Categories == category && x.Price == price).ToListAsync();
+            await _booksCollection.Find(x => x.Title.Contains(title) && x.Authors == author && x.Categories == category && x.Price == price).ToListAsync();
 
         //USERS CRUD
         public async Task<List<User>> GetUserAsync() =>

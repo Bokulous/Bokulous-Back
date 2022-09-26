@@ -117,13 +117,20 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
     [HttpGet("GetBooksFiltered")]
-    //public async Task<ActionResult<List<Book>>> GetBooksFiltered(string title, string author, string genre, string language, string publisher, string year)
-    //{
-    //    var books = await _bokulousDbService.GetBooksFilteredAsync(title, author, genre, language, publisher, year);
+    public async Task<ActionResult<List<Book>>> GetBookByKeyword(string keyword)
+    {
+        if (string.IsNullOrEmpty(keyword))
+            return NotFound("Missing a keyword");
 
-    //    if (books is null)
-    //        return NotFound();
+        var filter = await _bokulousDbService.GetBookAsync();
+        if (filter.Count == 0 || filter is null)
+            return NotFound("No categories found");
 
-    //    return Ok(books);
-    //}
+        var booksFiltered = filter.Where(x => x.Title.Contains(keyword) || x.Categories.Contains(keyword) || x.Authors.Contains(keyword) || x.Language.Contains(keyword)).ToList();
+
+        if (booksFiltered.Count == 0 || booksFiltered is null)
+            return NotFound("No books found");
+
+        return Ok(booksFiltered);
+    }
 }
