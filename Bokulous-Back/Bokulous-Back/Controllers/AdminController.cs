@@ -299,5 +299,113 @@ namespace Bokulous_Back.Controllers
 
             return Ok(result.User);
         }
+
+        [HttpPost("SoldItems")]
+        public async Task<ActionResult<double>> SoldItems(string adminId, string password)
+        {
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+
+            if (admin is null)
+                return NotFound("Admin could not be found");
+
+            if (!await UserHelpers.CheckIsAdmin(adminId, password))
+                return Forbid("Failed admin check");
+
+            var users = await _bokulousDbService.GetUserAsync();
+            double sum = 0;
+
+            users.ForEach(user =>
+            {
+                var soldItems = user.Previous_Books_Sold.ToList();
+
+                soldItems.ForEach(item => sum += item.Price);
+            });
+
+            return Ok(sum);
+        }
+
+        [HttpPost("SoldItems")]
+        public async Task<ActionResult<double>> SoldItems(int year, string adminId, string password)
+        {
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+
+            if (admin is null)
+                return NotFound("Admin could not be found");
+
+            if (!await UserHelpers.CheckIsAdmin(adminId, password))
+                return Forbid("Failed admin check");
+
+            var users = await _bokulousDbService.GetUserAsync();
+            double sum = 0;
+
+            users.ForEach(user =>
+            {
+                var soldItems = user.Previous_Books_Sold.ToList();
+
+                soldItems.ForEach(item =>
+                {
+                    if (item.Date.Year == year)
+                        sum += item.Price;
+                });
+            });
+
+            return Ok(sum);
+        }
+
+        [HttpPost("SoldItems")]
+        public async Task<ActionResult<double>> SoldItems(int year, int month, string adminId, string password)
+        {
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+
+            if (admin is null)
+                return NotFound("Admin could not be found");
+
+            if (!await UserHelpers.CheckIsAdmin(adminId, password))
+                return Forbid("Failed admin check");
+
+            var users = await _bokulousDbService.GetUserAsync();
+            double sum = 0;
+
+            users.ForEach(user =>
+            {
+                var soldItems = user.Previous_Books_Sold.ToList();
+
+                soldItems.ForEach(item =>
+                {
+                    if (item.Date.Year == year && item.Date.Month == month)
+                        sum += item.Price;
+                });
+            });
+
+            return Ok(sum);
+        }
+
+        [HttpPost("SoldItems")]
+        public async Task<ActionResult<double>> SoldItems(int year, int month, int day, string adminId, string password)
+        {
+            var admin = await _bokulousDbService.GetUserAsync(adminId);
+
+            if (admin is null)
+                return NotFound("Admin could not be found");
+
+            if (!await UserHelpers.CheckIsAdmin(adminId, password))
+                return Forbid("Failed admin check");
+
+            var users = await _bokulousDbService.GetUserAsync();
+            double sum = 0;
+
+            users.ForEach(user =>
+            {
+                var soldItems = user.Previous_Books_Sold.ToList();
+
+                soldItems.ForEach(item =>
+                {
+                    if (item.Date.Year == year && item.Date.Month == month && item.Date.Day == day)
+                        sum += item.Price;
+                });
+            });
+
+            return Ok(sum);
+        }
     }
 }
