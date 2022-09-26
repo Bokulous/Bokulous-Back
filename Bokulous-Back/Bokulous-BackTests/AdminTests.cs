@@ -220,6 +220,54 @@ namespace Bokulous_Back.Tests
             Assert.Equal(expected, actual);
         }
 
+        public async Task SoldItemsTest()
+        {
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.SoldItems(admin.Id, admin.Password)).Result as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        public async Task SoldItemsYearTest()
+        {
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.SoldItems(2022, admin.Id, admin.Password)).Result as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        public async Task SoldItemsMonthTest()
+        {
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.SoldItems(2022, 1, admin.Id, admin.Password)).Result as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
+        public async Task SoldItemsDayTest()
+        {
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+
+            var response = (await AdminController.SoldItems(2022, 1, 1, admin.Id, admin.Password)).Result as StatusCodeResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
+
+            Assert.Equal(expected, actual);
+        }
+
         public void Dispose()
         {
             TestData.RemoveDataFromDb();
