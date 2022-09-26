@@ -118,7 +118,7 @@ namespace Bokulous_Back.Controllers
 
             if (currentUser != null)
             {
-                currentUser.Password = "newpassword123" + rnd.Next(1, 10).ToString();
+                currentUser.Password = "newpassword123" + rnd.Next(1, 1000).ToString();
                 await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
                 return Ok(currentUser);
             }

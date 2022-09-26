@@ -116,7 +116,7 @@ namespace Bokulous_Back.Tests
         public void ForgotPasswordTest()
         {
             //arrange
-            var user = TestUsers.FirstOrDefault(x => x.Mail == "bla1@bla.com");
+            var user = TestData.Users.FirstOrDefault(x => x.Mail == "bla1@bla.com");
 
             //var password = "newpassword123";
 
@@ -133,7 +133,7 @@ namespace Bokulous_Back.Tests
         public void ForgotUsernameTest()
         {
             //arrange
-            var user = TestUsers.FirstOrDefault(x => x.Mail == "bla1@bla.com");
+            var user = TestData.Users.FirstOrDefault(x => x.Mail == "bla1@bla.com");
 
             //act
             var response = UsersController.ForgotUsername(user.Mail).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
@@ -146,7 +146,7 @@ namespace Bokulous_Back.Tests
         public void ActivateAccountTest()
         {
             //arrange
-            var user = TestUsers.FirstOrDefault(x => x.Username == "TEST_USER1");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
 
             //act
             var response = UsersController.ActivateAccount(user.Id).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
@@ -154,7 +154,7 @@ namespace Bokulous_Back.Tests
             //assert
             Assert.True(response.StatusCode == 200);
         }
-        
+
         public void Dispose()
         {
             TestData.RemoveDataFromDb();

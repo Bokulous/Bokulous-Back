@@ -54,6 +54,8 @@ namespace Bokulous_Back.Services
 
         public async Task<List<Book>> GetBooksAsyncByAuthor(string keyword) =>   // behöver ligga i service för att komma åt bookscollection
             await _booksCollection.Find(x => x.Authors.Any(y => y.Contains(keyword))).ToListAsync();
+        public async Task<List<Book>> GetBooksFilteredAsync(string title, string[] author, string[] category, double price) =>
+            await _booksCollection.Find(x => x.Title == title && x.Authors == author && x.Categories == category && x.Price == price).ToListAsync();
 
         //USERS CRUD
         public async Task<List<User>> GetUserAsync() =>
@@ -88,17 +90,9 @@ namespace Bokulous_Back.Services
             await _categoriesCollection.DeleteOneAsync(x => x.Id == id);
 
         //Login
-        public async Task<User> LoginAsync(User userLogin)
-        {
-            var currentUser = await _usersCollection.Find(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password).FirstOrDefaultAsync();
-
-            if (currentUser != null)
-            {
-                return currentUser;
-            }
-
-            return null;
-        }
+        public async Task<User> LoginAsync(User userLogin)=>
+            await _usersCollection.Find(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password).FirstOrDefaultAsync();
+        
         public async Task<User?> GetUserMailAsync(string mail) =>
             await _usersCollection.Find(x => x.Mail == mail).FirstOrDefaultAsync();
     }

@@ -116,4 +116,14 @@ public class BooksController : ControllerBase
 
         return Ok(books);
     }
+    [HttpGet("GetBooksFiltered")]
+    //public async Task<ActionResult<List<Book>>> GetBooksFiltered(string title, string author, string genre, string language, string publisher, string year)
+    //{
+    //    var books = await _bokulousDbService.GetBooksFilteredAsync(title, author, genre, language, publisher, year);
+
+    //    if (books is null)
+    //        return NotFound();
+
+    //    return Ok(books);
+    //}
 }
