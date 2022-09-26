@@ -52,9 +52,6 @@ namespace Bokulous_Back.Services
         public async Task RemoveBookAsync(string id) =>
             await _booksCollection.DeleteOneAsync(x => x.Id == id);
 
-        public async Task<List<Book>> GetBooksAsyncByAuthor(string keyword) =>   // behöver ligga i service för att komma åt bookscollection
-            await _booksCollection.Find(x => x.Authors.Any(y => y.Contains(keyword))).ToListAsync();
-
         //USERS CRUD
         public async Task<List<User>> GetUserAsync() =>
             await _usersCollection.Find(_ => true).ToListAsync();
