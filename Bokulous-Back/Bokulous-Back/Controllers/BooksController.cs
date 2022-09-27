@@ -116,21 +116,84 @@ public class BooksController : ControllerBase
 
         return Ok(books);
     }
+    //onödig?
+    //[HttpGet("GetBooksFiltered")]
+    //public async Task<ActionResult<List<Book>>> GetBookByKeyword(string keyword)
+    //{
+    //    if (string.IsNullOrEmpty(keyword))
+    //        return NotFound("Missing a keyword");
+
+    //    var filter = await _bokulousDbService.GetBookAsync();
+    //    if (filter.Count == 0 || filter is null)
+    //        return NotFound("No books found");
+
+    //    var booksFiltered = filter.Where(x => x.Title.Contains(keyword) || x.Authors.Contains(keyword)).ToList();
+
+    //    if (booksFiltered.Count == 0 || booksFiltered is null)
+    //        return NotFound("No books found");
+
+    //    return Ok(booksFiltered);
+    //}
+
     [HttpGet("GetBooksFiltered")]
-    public async Task<ActionResult<List<Book>>> GetBookByKeyword(string keyword)
+    public async Task<ActionResult<List<Book>>> GetBookByAdvancedFilter(string title, string author, string category, string language, int priceMin, int priceMax, int yearMin, int yearMax)
     {
-        if (string.IsNullOrEmpty(keyword))
-            return NotFound("Missing a keyword");
+        var result = new List<Book>();
 
-        var filter = await _bokulousDbService.GetBookAsync();
-        if (filter.Count == 0 || filter is null)
-            return NotFound("No categories found");
+        if (language is not null)
+        {
+            var filter = await _bokulousDbService.GetBookAsync();
+           
+            var booksFiltered = filter.Where(x => x.Language.Contains(language)).ToList();
 
-        var booksFiltered = filter.Where(x => x.Title.Contains(keyword) || x.Categories.Contains(keyword) || x.Authors.Contains(keyword) || x.Language.Contains(keyword)).ToList();
+            result.AddRange(booksFiltered);
+        }
 
-        if (booksFiltered.Count == 0 || booksFiltered is null)
-            return NotFound("No books found");
+        if (author is not null)
+        {
+            var filter = await _bokulousDbService.GetBookAsync();
 
-        return Ok(booksFiltered);
+            var booksFiltered = filter.Where(x => x.Authors.Contains(author)).ToList();
+
+            result.AddRange(booksFiltered);
+        }
+        
+        if (title is not null)
+        {
+            var filter = await _bokulousDbService.GetBookAsync();
+
+            var booksFiltered = filter.Where(x => x.Title.Contains(title)).ToList();
+
+            result.AddRange(booksFiltered);
+        }
+
+        if (category is not null)
+        {
+            var filter = await _bokulousDbService.GetBookAsync();
+
+            var booksFiltered = filter.Where(x => x.Categories.Contains(category)).ToList();
+
+            result.AddRange(booksFiltered);
+        }
+
+        if (priceMax != null || priceMin != null)
+        {
+            var filter = await _bokulousDbService.GetBookAsync();
+
+            var booksFiltered = filter.Where(x => x.Price <= priceMax && x.Price >= priceMin).ToList();
+
+            result.AddRange(booksFiltered);
+        }
+
+        if (yearMax != null || yearMin != null)
+        {
+            var filter = await _bokulousDbService.GetBookAsync();
+
+            var booksFiltered = filter.Where(x => x.Published <= yearMax && x.Published >= yearMin).ToList();
+
+            result.AddRange(booksFiltered);
+        }
+
+        return Ok(result);
     }
 }

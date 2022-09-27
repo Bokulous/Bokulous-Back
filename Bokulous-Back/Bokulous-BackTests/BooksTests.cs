@@ -79,6 +79,27 @@ namespace Bokulous_Back.Tests
             Assert.True(response.StatusCode == 200);
         }
 
+        [Fact()]
+        public async Task GetBooksFilteredTest()
+        {
+            //arrange
+            string title = "Test";
+            string author = "";
+            string category = "";
+            string language = "";
+            int priceMin = 0;
+            int priceMax = 0;
+            int yearMin = 0;
+            int yearMax = 0;
+
+
+            //act
+            var response = (await BooksController.GetBookByAdvancedFilter(title, author, category, language, priceMin, priceMax, yearMin, yearMax)).Result as ObjectResult;
+
+            //assert
+            Assert.True(response.StatusCode == 200);
+        }
+
         public void Dispose()
         {
             TestData.RemoveDataFromDb();
