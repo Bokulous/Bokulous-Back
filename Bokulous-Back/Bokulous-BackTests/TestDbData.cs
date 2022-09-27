@@ -84,7 +84,7 @@ namespace Bokulous_BackTests
 
             Books.Add(new Book()
             {
-                ISBN = "12345",
+                ISBN = "555555",
                 Title = "TEST 2",
                 Categories = new string[] { "Humor TEST" },
                 Language = "Svenska",
@@ -103,7 +103,7 @@ namespace Bokulous_BackTests
 
             Books.Add(new Book()
             {
-                ISBN = "12345",
+                ISBN = "22222",
                 Title = "TEST 3",
                 Categories = new string[] { "Fakta TEST" },
                 Language = "Svenska",
@@ -122,7 +122,7 @@ namespace Bokulous_BackTests
 
             Books.Add(new Book()
             {
-                ISBN = "12345",
+                ISBN = "54321",
                 Title = "TEST 4",
                 Categories = new string[] { "Deckare TEST" },
                 Language = "Svenska",
