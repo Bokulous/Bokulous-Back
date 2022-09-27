@@ -120,6 +120,25 @@ namespace Bokulous_BackTests
                 BookCover = default
             });
 
+            Books.Add(new Book()
+            {
+                ISBN = "12345",
+                Title = "TEST 4",
+                Categories = new string[] { "Deckare TEST" },
+                Language = "Svenska",
+                Authors = new string[] { "Testy Testersson" },
+                Published = 2022,
+                Weight = 300,
+                IsUsed = false,
+                InStorage = 4,
+                Price = 100,
+                Seller = new()
+                {
+                    Username = "Sarah"
+                },
+                BookCover = default
+            });
+
             book = new Book()
             {
                 Title = "TEST BOK",

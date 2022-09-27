@@ -6,8 +6,8 @@ using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace BookStoreApi.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
+[ApiController]
 public class BooksController : ControllerBase
 {
     private readonly BokulousDbService _bokulousDbService;

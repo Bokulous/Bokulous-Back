@@ -1,13 +1,13 @@
 ﻿using Bokulous_Back.Controllers;
+using Bokulous_Back.Models;
 using Bokulous_Back.Helpers;
 using Bokulous_Back.Services;
 using Bokulous_BackTests;
-using BookStoreApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
+using BookStoreApi.Controllers;
 
 namespace Bokulous_Back.Tests
 {
@@ -68,6 +68,13 @@ namespace Bokulous_Back.Tests
 
         [Fact()]
         public async void GetBooksByAuthor_Pass()
+        {
+            var actionResult = await BooksController.GetBooksByAuthor("Testersson");
+            var statusCodeResult = actionResult.Result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
+        [Fact()]
         public async void GetBooksReturns200()
         {
             var result = await BooksController.GetBooks();
@@ -117,7 +124,7 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public async void AddBookToStorageReturns200()
         {
-            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST 3" && x.Seller.Username == "Sarah");
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST 4" && x.Seller.Username == "Sarah");
             var response = await BooksController.AddBook(book);
             var result = response as ObjectResult;
             var obj = (Book)result.Value;
@@ -176,13 +183,6 @@ namespace Bokulous_Back.Tests
             Assert.True(statusCodeResult.StatusCode == 400);
         }
 
-        [Fact()]
-        public async Task GetBooksByAuthor_Pass()
-        {
-            var actionResult = await BooksController.GetBooksByAuthor("Testersson");
-            var statusCodeResult = actionResult.Result as ObjectResult;
-            Assert.True(statusCodeResult.StatusCode == 200);
-        }
 
         [Fact()]
         public async void UpdateBookWhereUpdatedBookIsNullReturns400()
