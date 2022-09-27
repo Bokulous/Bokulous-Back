@@ -3,9 +3,13 @@ using Bokulous_Back.Helpers;
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using Bokulous_BackTests;
-using BookStoreApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
+using BookStoreApi.Controllers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+using System.Net;
 
 namespace Bokulous_Back.Tests
 {
@@ -15,6 +19,7 @@ namespace Bokulous_Back.Tests
         private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
+        private BookHelpers BookHelpers;
         private AdminController AdminController;
         private UsersController UsersController;
         private BooksController BooksController;
@@ -23,6 +28,7 @@ namespace Bokulous_Back.Tests
         public AdminTests()
         {
             UserHelpers = new(dbService);
+            BookHelpers = new(dbService);
             AdminController = new(dbService);
             UsersController = new(dbService);
             BooksController = new(dbService);
@@ -99,6 +105,27 @@ namespace Bokulous_Back.Tests
             var actual = response?.StatusCode ?? throw new Exception("reponse was null");
 
             Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData("", StatusCodes.Status404NotFound)]
+        [InlineData(null, StatusCodes.Status404NotFound)]
+        public async void FindUsersByKeywordWhereKeywordIsNullOrEmptyReturnsStatusCode404(string keyword, object expectedResult)
+        {
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+            var actionResult = await AdminController.FindUser(keyword, admin.Id, admin.Password);
+            var notFoundObject = actionResult.Result as ObjectResult;
+            Assert.Equal(expectedResult, notFoundObject.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("Lasse", StatusCodes.Status403Forbidden)]
+        public async void FindUsersByKeywordWhereUserIsNotAdminReturnsStatusCode403(string keyword, int expectedResult)
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER2");
+            var actionResult = await AdminController.FindUser(keyword, user.Id, user.Password);
+            var forbidObject = actionResult.Result as StatusCodeResult;        
+            Assert.Equal(expectedResult, forbidObject.StatusCode);
         }
 
         [Fact()]

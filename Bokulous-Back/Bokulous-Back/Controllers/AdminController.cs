@@ -300,6 +300,27 @@ namespace Bokulous_Back.Controllers
             return Ok(result.User);
         }
 
+        [HttpGet("FindUser")]
+        public async Task<ActionResult<List<User>>> FindUser(string keyword, string adminId, string adminPassword)
+        {
+            if (!await UserHelpers.CheckIsAdmin(adminId, adminPassword))
+                return new StatusCodeResult(StatusCodes.Status403Forbidden);
+
+            if (string.IsNullOrEmpty(keyword))
+                return NotFound("Missing a keyword");
+
+            var allUsers = await _bokulousDbService.GetUserAsync();
+            if (allUsers.Count == 0 || allUsers is null)
+                return NotFound("No users found");
+
+            var users = allUsers.Where(x => x.Username.Contains(keyword)).ToList();
+
+            if (users.Count == 0 || users is null)
+                return NotFound("No user mathing the name found");
+
+            return Ok(users);
+        }
+
         [HttpPost("SoldItems")]
         public async Task<ActionResult<double>> SoldItems(string adminId, string password)
         {
