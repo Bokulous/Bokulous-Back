@@ -19,5 +19,6 @@ namespace Bokulous_Back.Models
         public bool IsUsed { get; set; }
         public int InStorage { get; set; }
         public double Price { get; set; }
+        public DateTime Date { get; set; }
     }
 }

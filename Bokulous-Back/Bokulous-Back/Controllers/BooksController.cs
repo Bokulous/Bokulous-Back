@@ -209,7 +209,7 @@ public class BooksController : ControllerBase
     {
         var book = await _bokulousDbService.GetBookAsync(bookId);
         var buyer = await _bokulousDbService.GetUserAsync(buyerId);
-        
+
         if (buyer is null)
             return NotFound("Buyer not found");
 
@@ -224,22 +224,32 @@ public class BooksController : ControllerBase
 
         if (book.InStorage < 1)
             return BadRequest("0 books in storage");
-        
+
         book.InStorage--;
         await _bokulousDbService.UpdateBookAsync(book.Id, book);
         // TODO: add method for sending mock-emails :)
         // maila orderbekräftelse till köpare
         // ev. maila till säljare(admin eller säljare av begagnad bok)
-        
+
         return Ok();
     }
 
-    [HttpPost("GetBooksByAuthor")] // har skrivit metoden i service för att inte behöva dependency injecta bookcollection
-    public async Task<ActionResult> GetBooksByAuthor(string keyword)
+    [HttpGet("GetBooksByAuthor")]
+    public async Task<ActionResult<List<Book>>> GetBooksByAuthor(string keyword)
     {
-        var books = await _bokulousDbService.GetBooksAsyncByAuthor(keyword);
+        if (string.IsNullOrEmpty(keyword))
+            return NotFound("Missing a keyword");
 
-        return Ok(books);
+        var books = await _bokulousDbService.GetBookAsync();
+        if (books.Count == 0 || books is null)
+            return NotFound("No books found by this author");
+
+        var book = books.Where(x => x.Authors.Any(y => y.Contains(keyword))).ToList();
+
+        if (book.Count == 0 || book is null)
+            return NotFound("No books mathing the author found");
+
+        return Ok(book);
     }
 
     [HttpGet("GetCategories")]

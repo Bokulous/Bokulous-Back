@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Newtonsoft.Json;
-using System.Diagnostics;
 using Xunit;
 
 namespace Bokulous_Back.Tests
@@ -16,8 +15,7 @@ namespace Bokulous_Back.Tests
     [Collection("Sequential")]
     public class UsersTests : IDisposable
     {
-
-        BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
+        private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
 
         private UserHelpers UserHelpers;
         private AdminController AdminController;
@@ -168,6 +166,7 @@ namespace Bokulous_Back.Tests
 
             Assert.True(response.StatusCode == 200);
         }
+
         [Fact()]
         public void LoginWrongPasswordTest()
         {
