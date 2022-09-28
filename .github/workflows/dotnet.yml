@@ -10,10 +10,10 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    environment: staging
     defaults:
       run: 
         working-directory: ./Bokulous-Back
-
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -28,13 +28,13 @@ jobs:
       with:
         files: '${{env.DOTNET_ROOT}}/Bokulous_Back/appsettings.json'
       env:
-        BokulousDatabase.ConnectionString: ${{ secrets.DatabaseConnectionStringStaging }}
-        BokulousDatabase.DatabaseName: ${{ secrets.DatabaseNameStaging }}
-        BokulousMailSettings.Username: ${{ secrets.MailUserrnameStaging }}
-        BokulousMailSettings.Password: ${{ secrets.MailPasswordStaging }}
-        BokulousMailSettings.FromAddress: ${{ secrets.MailFromAddressStaging }}
-        BokulousMailSettings.SmptAddress: ${{ secrets.MailSmptAddressStaging }}
-        BokulousMailSettings.Port: ${{ secrets.MailPortStaging }}
+        BokulousDatabase.ConnectionString: ${{ secrets.DatabaseConnectionString }}
+        BokulousDatabase.DatabaseName: ${{ secrets.DatabaseName }}
+        BokulousMailSettings.Username: ${{ secrets.MailUserrname }}
+        BokulousMailSettings.Password: ${{ secrets.MailPassword }}
+        BokulousMailSettings.FromAddress: ${{ secrets.MailFromAddress }}
+        BokulousMailSettings.SmptAddress: ${{ secrets.MailSmptAddress }}
+        BokulousMailSettings.Port: ${{ secrets.MailPort }}
     - name: Build
       run: dotnet build --no-restore
     - name: Test
