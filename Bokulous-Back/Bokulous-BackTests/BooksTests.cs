@@ -90,14 +90,17 @@ namespace Bokulous_Back.Tests
             int priceMin = 0;
             int priceMax = 0;
             int yearMin = 0;
-            int yearMax = 0;
+            int? yearMax = null;
 
 
             //act
-            var response = (await BooksController.GetBookByAdvancedFilter(title, author, category, language, priceMin, priceMax, yearMin, yearMax)).Result as ObjectResult;
+            var response = (await BooksController.GetBookByAdvancedFilter(title)).Result as ObjectResult;
+
+            var expected = 200;
+            var actual = response?.StatusCode ?? throw new Exception("reponse was null");
 
             //assert
-            Assert.True(response.StatusCode == 200);
+            Assert.Equal(expected, actual);
         }
 
         public void Dispose()
