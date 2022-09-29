@@ -131,7 +131,13 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public async void AddBookReturns201()
         {
-            var result = await BooksController.AddBook(TestData.book);
+            var book = new Book()
+            {
+                Title = "TEST BOK",
+                InStorage = 2
+            };
+
+            var result = await BooksController.AddBook(book);
             var statusCodeResult = result as CreatedAtActionResult;
             Assert.True(statusCodeResult.StatusCode == 201);
         }

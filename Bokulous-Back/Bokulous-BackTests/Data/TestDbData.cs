@@ -138,13 +138,6 @@ namespace Bokulous_BackTests.Data
                 },
                 BookCover = default
             });
-
-            book = new Book()
-            {
-                Title = "TEST BOK",
-                InStorage = 2
-            };
-
         }
 
         private void AddCategories()
@@ -177,7 +170,7 @@ namespace Bokulous_BackTests.Data
             Books.ForEach(async (book) => await _dbService.CreateBookAsync(book));
             Categories.ForEach(async (category) => await _dbService.CreateCategoryAsync(category));
 
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
 
             Users = _dbService.GetUserAsync().Result
                 .Where(x => x.Username
