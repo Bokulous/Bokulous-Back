@@ -1,9 +1,12 @@
 ﻿using Bokulous_Back.Controllers;
 using Bokulous_Back.Helpers;
+using Bokulous_Back.Models;
 using Bokulous_Back.Services;
-using Bokulous_BackTests;
+using Bokulous_BackTests.Data;
 using BookStoreApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Bokulous_Back.Tests
@@ -11,20 +14,34 @@ namespace Bokulous_Back.Tests
     [Collection("Sequential")]
     public class BooksTests : IDisposable
     {
-        private BokulousDbService dbService = new("mongodb+srv://Bokulous:nwQjaj3eVzesn5P9@cluster0.vtut1fa.mongodb.net/test", "Bokulous");
+        private readonly IConfiguration configuration;
+        private readonly IBokulousDbService dbService;
+        private readonly IBokulousMailService mailService;
 
-        private UserHelpers UserHelpers;
-        private AdminController AdminController;
-        private UsersController UsersController;
-        private BooksController BooksController;
-        private TestDbData TestData;
+        private readonly UserHelpers UserHelpers;
+        private readonly AdminController AdminController;
+        private readonly UsersController UsersController;
+        private readonly BooksController BooksController;
+        private readonly TestDbData TestData;
 
         public BooksTests()
         {
+            configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile(@"appsettings.json", false, false)
+                .AddEnvironmentVariables()
+                .Build();
+
+            IOptions<BokulousDatabaseSettings> databaseSettings = Options.Create(configuration.GetSection("BokulousDatabase").Get<BokulousDatabaseSettings>());
+            IOptions<BokulousMailSettings> mailSettings = Options.Create(configuration.GetSection("BokulousMailSettings").Get<BokulousMailSettings>());
+
+            dbService = new BokulousDbService(databaseSettings);
+            mailService = new BokulousMailService(mailSettings);
+
             UserHelpers = new(dbService);
-            AdminController = new(dbService);
-            UsersController = new(dbService);
-            BooksController = new(dbService);
+            AdminController = new(dbService, mailService);
+            UsersController = new(dbService, mailService);
+            BooksController = new(dbService, mailService);
             TestData = new(dbService);
 
             TestData.AddDataToDb();

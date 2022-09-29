@@ -1,4 +1,5 @@
-﻿using Bokulous_Back.Models;
+﻿using Bokulous_Back.Helpers;
+using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,16 @@ namespace BookStoreApi.Controllers;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-    private readonly BokulousDbService _bokulousDbService;
+    private readonly IBokulousDbService _bokulousDbService;
+    private readonly IBokulousMailService _bokulousMailService;
+    private UserHelpers UserHelpers;
 
-    public BooksController(BokulousDbService bokulousDbService) =>
+    public BooksController(IBokulousDbService bokulousDbService, IBokulousMailService bokulousMailService)
+    {
         _bokulousDbService = bokulousDbService;
+        _bokulousMailService = bokulousMailService;
+        UserHelpers = new(_bokulousDbService);
+    }
 
     [HttpGet("GetBooks")]
     public async Task<List<Book>> GetBooks() =>

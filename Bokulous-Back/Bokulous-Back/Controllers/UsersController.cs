@@ -9,12 +9,14 @@ namespace Bokulous_Back.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private BokulousDbService _bokulousDbService;
+        private IBokulousDbService _bokulousDbService;
+        private IBokulousMailService _bokulousMailService;
         private UserHelpers userHelper;
 
-        public UsersController(BokulousDbService bokulousDbService)
+        public UsersController(IBokulousDbService bokulousDbService, IBokulousMailService bokulousMailService)
         {
             _bokulousDbService = bokulousDbService;
+            _bokulousMailService = bokulousMailService;
             userHelper = new(_bokulousDbService);
         }
 

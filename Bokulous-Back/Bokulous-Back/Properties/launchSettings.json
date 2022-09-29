@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Bokulous_Back": {
+    "Local_Db_Development": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

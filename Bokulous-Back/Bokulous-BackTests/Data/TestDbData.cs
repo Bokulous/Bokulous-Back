@@ -1,17 +1,17 @@
 ﻿using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 
-namespace Bokulous_BackTests
+namespace Bokulous_BackTests.Data
 {
     internal class TestDbData
     {
-        private BokulousDbService _dbService;
+        private IBokulousDbService _dbService;
 
         public List<User> Users { get; set; }
         public List<Book> Books { get; set; }
         public List<Category> Categories { get; set; }
 
-        public TestDbData(BokulousDbService dbService)
+        public TestDbData(IBokulousDbService dbService)
         {
             _dbService = dbService;
 

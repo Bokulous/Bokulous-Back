@@ -2,6 +2,7 @@
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Bokulous_Back.Controllers
 {
@@ -9,13 +10,18 @@ namespace Bokulous_Back.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-        private BokulousDbService _bokulousDbService;
+        private IBokulousDbService _bokulousDbService;
+        private IBokulousMailService? _bokulousMailService;
         private UserHelpers UserHelpers;
 
-        public AdminController(BokulousDbService bokulousDbService)
+        public AdminController(IBokulousDbService bokulousDbService, IBokulousMailService bokulousMailService)
         {
             _bokulousDbService = bokulousDbService;
+            _bokulousMailService = bokulousMailService;
             UserHelpers = new(_bokulousDbService);
+
+            Debug.WriteLine("Injected mail-service to AdminController");
+            _bokulousMailService.SendEmail("el_maco@hotmail.se", "Testing mail servicce", "Hello World!");
         }
 
         [HttpPut("InactivateUser")]
@@ -323,8 +329,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok(sum);
         }
-
-        [HttpPost("SoldItems")]
+        [HttpPost("SoldItemsYear")]
         public async Task<ActionResult<double>> SoldItems(int year, string adminId, string password)
         {
             var admin = await _bokulousDbService.GetUserAsync(adminId);
@@ -351,8 +356,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok(sum);
         }
-
-        [HttpPost("SoldItems")]
+        [HttpPost("SoldItemsMonth")]
         public async Task<ActionResult<double>> SoldItems(int year, int month, string adminId, string password)
         {
             var admin = await _bokulousDbService.GetUserAsync(adminId);
@@ -379,8 +383,7 @@ namespace Bokulous_Back.Controllers
 
             return Ok(sum);
         }
-
-        [HttpPost("SoldItems")]
+        [HttpPost("SoldItemsDay")]
         public async Task<ActionResult<double>> SoldItems(int year, int month, int day, string adminId, string password)
         {
             var admin = await _bokulousDbService.GetUserAsync(adminId);
