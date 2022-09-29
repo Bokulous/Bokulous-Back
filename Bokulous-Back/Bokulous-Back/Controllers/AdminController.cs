@@ -43,7 +43,7 @@ namespace Bokulous_Back.Controllers
 
             await _bokulousDbService.UpdateUserAsync(userId, user);
 
-            var check = await _bokulousDbService.GetUserAsync(userId);
+            var check = await _bokulousDbService.GetUserAsync(userId) ?? throw new Exception("Db connection error");
 
             if (check.IsActive)
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);

@@ -8,11 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Xunit;
-using BookStoreApi.Controllers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
-using System.Net;
 
 namespace Bokulous_Back.Tests
 {
@@ -28,8 +24,6 @@ namespace Bokulous_Back.Tests
         private readonly UsersController UsersController;
         private readonly BooksController BooksController;
         private readonly TestDbData TestData;
-        private BookHelpers BookHelpers;
-        private TestDbData TestData;
 
         public AdminTests()
         {
@@ -70,11 +64,13 @@ namespace Bokulous_Back.Tests
         [Fact()]
         public async Task CheckIsNotAdminTest()
         {
-            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
+            const string USERNAME = "TEST_USER1";
+
+            var user = TestData.Users.FirstOrDefault(x => x.Username == USERNAME) ?? throw new Exception(USERNAME + " could not be found");
 
             var expected = false;
 
-            var actual = UserHelpers.CheckIsAdmin(user.Id, user.Password).Result;
+            var actual = await UserHelpers.CheckIsAdmin(user.Id, user.Password);
 
             Assert.Equal(expected, actual);
         }
