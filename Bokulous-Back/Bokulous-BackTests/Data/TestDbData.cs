@@ -177,7 +177,7 @@ namespace Bokulous_BackTests.Data
             Books.ForEach(async (book) => await _dbService.CreateBookAsync(book));
             Categories.ForEach(async (category) => await _dbService.CreateCategoryAsync(category));
 
-            Thread.Sleep(100);
+            Thread.Sleep(200);
 
             Users = _dbService.GetUserAsync().Result
                 .Where(x => x.Username
