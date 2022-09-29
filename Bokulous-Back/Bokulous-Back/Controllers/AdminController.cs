@@ -19,9 +19,6 @@ namespace Bokulous_Back.Controllers
             _bokulousDbService = bokulousDbService;
             _bokulousMailService = bokulousMailService;
             UserHelpers = new(_bokulousDbService);
-
-            Debug.WriteLine("Injected mail-service to AdminController");
-            _bokulousMailService.SendEmail("el_maco@hotmail.se", "Testing mail servicce", "Hello World!");
         }
 
         [HttpPut("InactivateUser")]

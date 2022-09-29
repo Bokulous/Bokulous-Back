@@ -1,6 +1,7 @@
 ﻿using Bokulous_Back.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Diagnostics;
 
 namespace Bokulous_Back.Services
 {
@@ -19,6 +20,8 @@ namespace Bokulous_Back.Services
             booksCollection = mongoDatabase.GetCollection<Book>("Books");
             usersCollection = mongoDatabase.GetCollection<User>("Users");
             categoriesCollection = mongoDatabase.GetCollection<Category>("Categories");
+
+            Debug.WriteLine("Using DB: " + bokulousDatabaseSettings.Value.DatabaseName);
         }
 
         //BOOKS CRUD
