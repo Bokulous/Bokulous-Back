@@ -26,7 +26,7 @@ jobs:
     - name: App Settings Variable Substitution
       uses: microsoft/variable-substitution@v1
       with:
-        files: '/home/runner/work/Bokulous-Back/Bokulous-Back/Bokulous-Back/Bokulous-Back/Bokulous-Back.csproj/appsettings.json'
+        files: '/home/runner/work/Bokulous-Back/Bokulous-Back/Bokulous-Back/Bokulous-Back/appsettings.json'
       env:
         BokulousDatabase.ConnectionString: ${{ secrets.DatabaseConnectionString }}
         BokulousDatabase.DatabaseName: ${{ secrets.DatabaseName }}
