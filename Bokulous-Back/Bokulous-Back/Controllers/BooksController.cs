@@ -1,8 +1,7 @@
-﻿using Bokulous_Back.Models;
+﻿using Bokulous_Back.Helpers;
+using Bokulous_Back.Models;
 using Bokulous_Back.Services;
-using Bokulous_Back.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace BookStoreApi.Controllers;
 
@@ -10,12 +9,16 @@ namespace BookStoreApi.Controllers;
 [ApiController]
 public class BooksController : ControllerBase
 {
-    private readonly BokulousDbService _bokulousDbService;
+    private readonly IBokulousDbService _bokulousDbService;
+    private readonly IBokulousMailService _bokulousMailService;
+    private UserHelpers UserHelpers;
     private BookHelpers BookHelper;
 
-    public BooksController(BokulousDbService bokulousDbService)
+    public BooksController(IBokulousDbService bokulousDbService, IBokulousMailService bokulousMailService)
     {
         _bokulousDbService = bokulousDbService;
+        _bokulousMailService = bokulousMailService;
+        UserHelpers = new(_bokulousDbService);
         BookHelper = new(_bokulousDbService);
     }
 
@@ -109,12 +112,9 @@ public class BooksController : ControllerBase
     }
 
     [HttpPut("AddBookToCategory")]
-    public async Task<ActionResult> AddBookToCategory(Book book, Category category)
+    public async Task<ActionResult> AddBookToCategory(string bookId, Category category)
     {
-        if (book is null || category is null)
-            return BadRequest();
-
-        var books = await _bokulousDbService.GetBookAsync(book.Id);
+        var books = await _bokulousDbService.GetBookAsync(bookId);
 
         if (books is null)
             return BadRequest();
