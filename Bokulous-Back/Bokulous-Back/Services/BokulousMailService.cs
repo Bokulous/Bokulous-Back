@@ -24,6 +24,9 @@ namespace Bokulous_Back.Services
             _fromAddress = bokulousMailSettings.Value.FromAddress;
             _smptAddress = bokulousMailSettings.Value.SmptAddress;
             int.TryParse(bokulousMailSettings.Value.Port, out _port);
+
+
+            Debug.WriteLine("Using Mail Username: " + bokulousMailSettings.Value.Username);
         }
 
         public void SendEmail(string ToAddress, string subject, string body)

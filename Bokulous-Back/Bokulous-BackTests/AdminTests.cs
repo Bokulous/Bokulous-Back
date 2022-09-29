@@ -30,6 +30,8 @@ namespace Bokulous_Back.Tests
             configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(@"appsettings.json", false, false)
+                .AddUserSecrets<BokulousDatabaseSettings>()
+                .AddUserSecrets<BokulousMailSettings>()
                 .AddEnvironmentVariables()
                 .Build();
 
