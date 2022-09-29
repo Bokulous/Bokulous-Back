@@ -24,8 +24,7 @@ jobs:
       run: dotnet restore
       #substitute production appsettings entries to appsettings json file
     - name: App Settings Variable Substitution
-    - uses: actions/checkout@v3
-    - uses: microsoft/variable-substitution@v1
+      uses: microsoft/variable-substitution@v1
       with:
         files: 'Bokulous_Back/Bokulous_Back/appsettings.json'
       env:
