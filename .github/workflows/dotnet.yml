@@ -2,18 +2,18 @@ name: .NET
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "staging" ]
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "staging" ]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    environment: staging
     defaults:
       run: 
         working-directory: ./Bokulous-Back
-
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -22,6 +22,19 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
+      #substitute production appsettings entries to appsettings json file
+    - name: App Settings Variable Substitution
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: '/home/runner/work/Bokulous-Back/Bokulous-Back/Bokulous-Back/Bokulous-Back/appsettings.json'
+      env:
+        BokulousDatabase.ConnectionString: ${{ secrets.DatabaseConnectionString }}
+        BokulousDatabase.DatabaseName: ${{ secrets.DatabaseName }}
+        BokulousMailSettings.Username: ${{ secrets.MailUserrname }}
+        BokulousMailSettings.Password: ${{ secrets.MailPassword }}
+        BokulousMailSettings.FromAddress: ${{ secrets.MailFromAddress }}
+        BokulousMailSettings.SmptAddress: ${{ secrets.MailSmptAddress }}
+        BokulousMailSettings.Port: ${{ secrets.MailPort }}
     - name: Build
       run: dotnet build --no-restore
     - name: Test

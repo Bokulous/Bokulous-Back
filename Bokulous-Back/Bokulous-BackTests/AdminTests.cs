@@ -8,6 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Xunit;
+using BookStoreApi.Controllers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
+using System.Net;
 
 namespace Bokulous_Back.Tests
 {
@@ -23,6 +28,8 @@ namespace Bokulous_Back.Tests
         private readonly UsersController UsersController;
         private readonly BooksController BooksController;
         private readonly TestDbData TestData;
+        private BookHelpers BookHelpers;
+        private TestDbData TestData;
 
         public AdminTests()
         {
@@ -115,6 +122,27 @@ namespace Bokulous_Back.Tests
             var actual = response?.StatusCode ?? throw new Exception("reponse was null");
 
             Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData("", StatusCodes.Status404NotFound)]
+        [InlineData(null, StatusCodes.Status404NotFound)]
+        public async void FindUsersByKeywordWhereKeywordIsNullOrEmptyReturnsStatusCode404(string keyword, object expectedResult)
+        {
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+            var actionResult = await AdminController.FindUser(keyword, admin.Id, admin.Password);
+            var notFoundObject = actionResult.Result as ObjectResult;
+            Assert.Equal(expectedResult, notFoundObject.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("Lasse", StatusCodes.Status403Forbidden)]
+        public async void FindUsersByKeywordWhereUserIsNotAdminReturnsStatusCode403(string keyword, int expectedResult)
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER2");
+            var actionResult = await AdminController.FindUser(keyword, user.Id, user.Password);
+            var forbidObject = actionResult.Result as StatusCodeResult;        
+            Assert.Equal(expectedResult, forbidObject.StatusCode);
         }
 
         [Fact()]

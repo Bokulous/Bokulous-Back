@@ -1,13 +1,17 @@
 using Bokulous_Back.Models;
 using Bokulous_Back.Services;
 
-var AllowAnyOrigin = "_allowAnyOrigin";
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: AllowAnyOrigin, policy => { policy.AllowAnyOrigin(); });
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                      });
 });
 
 // Add services to the container.
@@ -34,7 +38,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
     app.UseSwaggerUI();
 }
 
-app.UseCors(AllowAnyOrigin);
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseHttpsRedirection();
 
