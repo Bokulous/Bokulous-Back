@@ -200,10 +200,10 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public async Task UnBlockUserTest()
+        public async Task UnblockUserTest()
         {
-            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1");
-            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN");
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER1") ?? throw new Exception("user could not be found");
+            var admin = TestData.Users.FirstOrDefault(x => x.Username == "TEST_ADMIN") ?? throw new Exception("admin could not be found");
 
             var response = (await AdminController.UnblockUser(user.Id, admin.Id, admin.Password)) as StatusCodeResult;
 
