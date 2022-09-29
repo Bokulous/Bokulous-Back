@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Local_Db_Development": {
+    "Dev": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

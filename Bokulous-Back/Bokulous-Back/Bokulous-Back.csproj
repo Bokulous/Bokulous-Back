@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Bokulous_Back</RootNamespace>
+    <UserSecretsId>0dfd1391-f236-4d26-beab-bb37f8e3326d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
