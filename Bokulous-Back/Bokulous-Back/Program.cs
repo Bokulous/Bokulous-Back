@@ -15,10 +15,13 @@ builder.Services.AddCors(options =>
 });
 
 // Add services to the container.
-builder.Services.Configure<BokulousDatabaseSettings>(
-    builder.Configuration.GetSection("BokulousDatabase"));
+builder.Services
+    .Configure<BokulousDatabaseSettings>(builder.Configuration.GetSection("BokulousDatabase"))
+    .Configure<BokulousMailSettings>(builder.Configuration.GetSection("BokulousMailSettings"));
 
-builder.Services.AddSingleton<BokulousDbService>();
+builder.Services
+    .AddSingleton<IBokulousDbService, BokulousDbService>()
+    .AddSingleton<IBokulousMailService, BokulousMailService>();
 
 builder.Services.AddMvc();
 builder.Services.AddControllers();
@@ -29,7 +32,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

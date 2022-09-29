@@ -9,9 +9,9 @@ namespace Bokulous_Back.Helpers
 {
     public class BookHelpers
     {
-        private static BokulousDbService _bokulousDbService;
+        private static IBokulousDbService _bokulousDbService;
 
-        public BookHelpers(BokulousDbService bokulousDbService)
+        public BookHelpers(IBokulousDbService bokulousDbService)
         {
             _bokulousDbService = bokulousDbService;
         }

@@ -4,9 +4,9 @@ namespace Bokulous_Back.Helpers
 {
     public class UserHelpers
     {
-        private static BokulousDbService _bokulousDbService;
+        private static IBokulousDbService _bokulousDbService;
 
-        public UserHelpers(BokulousDbService bokulousDbService)
+        public UserHelpers(IBokulousDbService bokulousDbService)
         {
             _bokulousDbService = bokulousDbService;
         }
