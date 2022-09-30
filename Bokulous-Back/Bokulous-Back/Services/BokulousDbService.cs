@@ -73,16 +73,11 @@ namespace Bokulous_Back.Services
             await categoriesCollection.DeleteOneAsync(x => x.Id == id);
 
         //Login
-        public async Task<User> LoginAsync(User userLogin)
-        {
-            var currentUser = await usersCollection.Find(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password).FirstOrDefaultAsync();
+        public async Task<User> LoginAsync(User userLogin) =>
+            await usersCollection.Find(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password).FirstOrDefaultAsync();
 
-            if (currentUser != null)
-            {
-                return currentUser;
-            }
+        public async Task<User?> GetUserMailAsync(string mail) =>
+           await usersCollection.Find(x => x.Mail == mail).FirstOrDefaultAsync();
 
-            return null;
-        }
     }
 }
