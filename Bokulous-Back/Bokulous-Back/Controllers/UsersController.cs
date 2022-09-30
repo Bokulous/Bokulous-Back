@@ -133,7 +133,8 @@ namespace Bokulous_Back.Controllers
 
             if (currentUser != null)
             {
-                currentUser.Username = "newusername" + rnd.Next(1, 1000).ToString();
+                var newUsername = "newusername" + rnd.Next(100, 1000).ToString();
+                currentUser.Username = newUsername;
                 await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
                 return Ok(currentUser);
             }

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Bokulous_Back</RootNamespace>
+    <UserSecretsId>2ec5fc9b-ecf4-4078-986c-cb7158dffea4</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
