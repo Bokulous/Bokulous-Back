@@ -196,10 +196,17 @@ namespace Bokulous_Back.Controllers
 
             if (user != null)
             {
-                user.IsActive = true;
-                await _bokulousDbService.UpdateUserAsync(user.Id, user);
-                
-                return Ok(user);
+                Guid g = Guid.NewGuid();
+                string code = g.ToString();
+                user.ActivationCode = code;
+                _bokulousMailService.SendEmail(user.Mail, "Activation Code", "Your activation code: " + code);
+                string userInput = "";
+                if (userHelper.verifyActivationCode(user.ActivationCode, userInput))
+                {
+                    user.IsActive = true;
+                    await _bokulousDbService.UpdateUserAsync(user.Id, user);
+                    return Ok(user);
+                }
             }
 
             return NotFound("User does not exist");

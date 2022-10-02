@@ -18,5 +18,6 @@ namespace Bokulous_Back.Models
         public List<UserBooks>? Previous_Books_Sold { get; set; }
         public bool IsAdmin { get; set; }
         public bool IsSeller { get; set; }
+        public string ActivationCode { get; set; } = "";
     }
 }
