@@ -263,6 +263,35 @@ namespace Bokulous_Back.Tests
             var statusCodeResult = (IStatusCodeActionResult)actionResult;
             Assert.Equal(expectedResult, statusCodeResult.StatusCode);
         }
+        [Fact()]
+        public void ForgotPasswordTest()
+        {
+            //arrange
+            var user = TestData.Users.FirstOrDefault(x => x.Mail == "bla1@bla.com");
+
+            //var password = "newpassword123";
+
+            //act
+            var response = UsersController.ForgotPassword(user.Mail).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+            //var value = response.Value as User;
+
+            //assert
+            //Assert.True(value.Password == user.Password);
+            Assert.True(response.StatusCode == 200);
+        }
+
+        [Fact()]
+        public void ForgotUsernameTest()
+        {
+            //arrange
+            var user = TestData.Users.FirstOrDefault(x => x.Mail == "bla1@bla.com");
+
+            //act
+            var response = UsersController.ForgotUsername(user.Mail).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+
+            //assert
+            Assert.True(response.StatusCode == 200);
+        }
         public void Dispose()
         {
             TestData.RemoveDataFromDb();
