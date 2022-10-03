@@ -49,6 +49,9 @@ namespace Bokulous_Back.Controllers
         [HttpPost("AddUser")]
         public async Task<IActionResult> AddUser(User newUser)
         {
+            const string ADDRESS = "https://localhost:7204/api";
+
+
             if (newUser is null)
                 return BadRequest();
 
@@ -68,8 +71,11 @@ namespace Bokulous_Back.Controllers
             if (!userHelper.CheckIsPasswordValid(newUser.Password))
                 return BadRequest("Password is not valid");
 
-            await _bokulousDbService.CreateUserAsync(newUser);
+            string code = rnd.Next(100000, 999999).ToString();
+            newUser.ActivationCode = code;
 
+            await _bokulousDbService.CreateUserAsync(newUser);
+            _bokulousMailService.SendEmail(newUser.Mail, "Welcome to Bokulous", "Welcome to Bokulous, " + newUser.Username + "! Verify your account here: <a href='" + ADDRESS + "/ActivateAccount/" + newUser.Id + "/" + newUser.ActivationCode + "'>here</a>");
             return Ok();
         }
 
@@ -189,27 +195,26 @@ namespace Bokulous_Back.Controllers
             return NotFound("Mail does not exist");
         }
 
-        [HttpPost("ActivateAccount")]
-        public async Task<ActionResult> ActivateAccount(string id)
+        [HttpGet("ActivateAccount/{id}/{code}")]
+        public async Task<ActionResult> ActivateAccount(string id, string code)
         {
             var user = await _bokulousDbService.GetUserAsync(id);
 
-            if (user != null)
+            if (user is null)
+                return NotFound();
+
+            if (user.ActivationCode == code)
             {
-                Guid g = Guid.NewGuid();
-                string code = g.ToString();
-                user.ActivationCode = code;
-                _bokulousMailService.SendEmail(user.Mail, "Activation Code", "Your activation code: " + code);
-                string userInput = "";
-                if (userHelper.verifyActivationCode(user.ActivationCode, userInput))
-                {
-                    user.IsActive = true;
-                    await _bokulousDbService.UpdateUserAsync(user.Id, user);
-                    return Ok(user);
-                }
+                user.IsActive = true;
+                await _bokulousDbService.UpdateUserAsync(user.Id, user);
+                return Ok();
+            }
+            else
+            {
+                return Forbid("Wrong code");
             }
 
-            return NotFound("User does not exist");
+            return BadRequest();
         }
     }
 }
