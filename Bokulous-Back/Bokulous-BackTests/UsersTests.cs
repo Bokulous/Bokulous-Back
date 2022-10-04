@@ -195,27 +195,6 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
-        public void RegisterTest()
-        {
-            User user = new User()
-            {
-                IsActive = true,
-                IsAdmin = false,
-                IsBlocked = false,
-                IsSeller = false,
-                Mail = "bla6@bla.com",
-                Password = "hej1234",
-                Previous_Orders = new List<UserBooks>(),
-                Username = "TEST_USER3"
-            };
-            TestData.Users.Add(user);
-
-            var response = UsersController.Register(user).Result as Microsoft.AspNetCore.Mvc.StatusCodeResult;
-
-            Assert.True(response.StatusCode == 200);
-        }
-
-        [Fact()]
         public void EditProfilePass()
         {
             //arrange

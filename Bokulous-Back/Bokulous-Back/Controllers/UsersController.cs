@@ -79,20 +79,6 @@ namespace Bokulous_Back.Controllers
             return Ok();
         }
 
-        [HttpPost("Register")]
-        public async Task<ActionResult> Register(User newUser)
-        {
-            if (!userHelper.CheckIsUsernameValid(newUser.Username))
-                return BadRequest("Username is not valid");
-
-            if (!userHelper.CheckIsPasswordValid(newUser.Password))
-                return BadRequest("Password is not valid");
-
-            await _bokulousDbService.CreateUserAsync(newUser);
-
-            return Ok();
-        }
-
         [HttpPut("ChangePassword")]
         public async Task<ActionResult> ChangePassword(string id, string newPassword)
         {
