@@ -295,4 +295,70 @@ public class BooksController : ControllerBase
 
         return Ok(books);
     }
+        }
+
+        if (priceMax is not null)
+        {
+            result = result.Where(x => x.Price <= priceMax).ToList();
+        }
+
+        if (yearMin is not null)
+        {
+            result = result.Where(x => x.Published >= yearMin).ToList();
+        }
+
+        if (yearMax is not null)
+        {
+            result = result.Where(x => x.Published <= yearMax).ToList();
+        }
+
+        if (result is null)
+            return NotFound("No books found");
+
+        return Ok(result);
+    }
+        }
+
+        if (priceMax is not null)
+        {
+            result = result.Where(x => x.Price <= priceMax).ToList();
+        }
+
+        if (yearMin is not null)
+        {
+            result = result.Where(x => x.Published >= yearMin).ToList();
+        }
+
+        if (yearMax is not null)
+        {
+            result = result.Where(x => x.Published <= yearMax).ToList();
+        }
+
+        if (result is null)
+            return NotFound("No books found");
+
+        return Ok(result);
+    }
+        }
+
+        if (priceMax is not null)
+        {
+            result = result.Where(x => x.Price <= priceMax).ToList();
+        }
+
+        if (yearMin is not null)
+        {
+            result = result.Where(x => x.Published >= yearMin).ToList();
+        }
+
+        if (yearMax is not null)
+        {
+            result = result.Where(x => x.Published <= yearMax).ToList();
+        }
+
+        if (result is null)
+            return NotFound("No books found");
+
+        return Ok(result);
+    }
 }
