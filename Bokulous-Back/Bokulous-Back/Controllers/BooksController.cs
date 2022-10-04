@@ -343,4 +343,56 @@ public class BooksController : ControllerBase
 
     //    return img;     
     //}
+
+    [HttpGet("GetBooksFiltered")]
+    public async Task<ActionResult<List<Book>>> GetBookByAdvancedFilter(string? title = null, string? author = null, string? category = null, string? language = null, int? priceMin = null, int? priceMax = null, int? yearMin = null, int? yearMax = null)
+    {
+        var result = await _bokulousDbService.GetBookAsync();
+
+
+        if (language is not null)
+        {
+            result = result.Where(x => x.Language.Contains(language)).ToList();
+        }
+
+        if (category is not null)
+        {
+            result = result.Where(x => x.Categories.Contains(category)).ToList();
+        }
+
+        if (title is not null)
+        {
+            result = result.Where(x => x.Title.Contains(title)).ToList();
+        }
+
+        if (author is not null)
+        {
+            result = result.Where(x => x.Authors.Contains(author)).ToList();
+        }
+
+        if (priceMin is not null)
+        {
+            result = result.Where(x => x.Price >= priceMin).ToList();
+        }
+
+        if (priceMax is not null)
+        {
+            result = result.Where(x => x.Price <= priceMax).ToList();
+        }
+
+        if (yearMin is not null)
+        {
+            result = result.Where(x => x.Published >= yearMin).ToList();
+        }
+
+        if (yearMax is not null)
+        {
+            result = result.Where(x => x.Published <= yearMax).ToList();
+        }
+
+        if (result is null)
+            return NotFound("No books found");
+
+        return Ok(result);
+    }
 }

@@ -43,5 +43,12 @@ namespace Bokulous_Back.Helpers
 
             return true;
         }
+        public bool verifyActivationCode(string code, string userInput)
+        {
+            if (code == userInput)
+                return true;
+
+            return false;
+        }
     }
 }
