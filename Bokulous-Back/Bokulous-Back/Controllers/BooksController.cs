@@ -54,8 +54,22 @@ public class BooksController : ControllerBase
         if (newBook is null)
             return BadRequest();
 
+        var books = await _bokulousDbService.GetBookAsync();
+        if (books is null || books.Count == 0)
+            return NotFound();
+
+        var book = books.FirstOrDefault(x => x.ISBN == newBook.ISBN && x.Seller.Username == newBook.Seller.Username);
+        if (book is null)
+        {
             await _bokulousDbService.CreateBookAsync(newBook);
             return CreatedAtAction(nameof(AddBook), new { id = newBook.Id }, newBook);
+        }
+        else
+        {
+            book.InStorage++;
+            await _bokulousDbService.UpdateBookAsync(book.Id, book);
+            return Ok(book);
+        }
     }
 
     [HttpPut("UpdateBook/{id:length(24)}")]
@@ -100,12 +114,6 @@ public class BooksController : ControllerBase
     [HttpPut("AddBookToCategory")]
     public async Task<ActionResult> AddBookToCategory(string bookId, Category category)
     {
-        if(string.IsNullOrEmpty(bookId))
-            return BadRequest();
-
-        if (category is null)
-            return BadRequest();
-
         var books = await _bokulousDbService.GetBookAsync(bookId);
 
         if (books is null)
@@ -287,36 +295,50 @@ public class BooksController : ControllerBase
 
         return Ok(books);
     }
-
-    [HttpGet("GetBooksFiltered")]
-    public async Task<ActionResult<List<Book>>> GetBookByAdvancedFilter(string? title = null, string? author = null, string? category = null, string? language = null, int? priceMin = null, int? priceMax = null, int? yearMin = null, int? yearMax = null)
-    {
-        var result = await _bokulousDbService.GetBookAsync();
-
-
-        if (language is not null)
-        {
-            result = result.Where(x => x.Language.Contains(language)).ToList();
         }
 
-        if (category is not null)
+        if (priceMax is not null)
         {
-            result = result.Where(x => x.Categories.Contains(category)).ToList();
+            result = result.Where(x => x.Price <= priceMax).ToList();
         }
 
-        if (title is not null)
+        if (yearMin is not null)
         {
-            result = result.Where(x => x.Title.Contains(title)).ToList();
+            result = result.Where(x => x.Published >= yearMin).ToList();
         }
 
-        if (author is not null)
+        if (yearMax is not null)
         {
-            result = result.Where(x => x.Authors.Contains(author)).ToList();
+            result = result.Where(x => x.Published <= yearMax).ToList();
         }
 
-        if (priceMin is not null)
+        if (result is null)
+            return NotFound("No books found");
+
+        return Ok(result);
+    }
+        }
+
+        if (priceMax is not null)
         {
-            result = result.Where(x => x.Price >= priceMin).ToList();
+            result = result.Where(x => x.Price <= priceMax).ToList();
+        }
+
+        if (yearMin is not null)
+        {
+            result = result.Where(x => x.Published >= yearMin).ToList();
+        }
+
+        if (yearMax is not null)
+        {
+            result = result.Where(x => x.Published <= yearMax).ToList();
+        }
+
+        if (result is null)
+            return NotFound("No books found");
+
+        return Ok(result);
+    }
         }
 
         if (priceMax is not null)

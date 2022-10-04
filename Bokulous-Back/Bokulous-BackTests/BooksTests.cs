@@ -25,7 +25,7 @@ namespace Bokulous_Back.Tests
         private readonly UsersController UsersController;
         private readonly BooksController BooksController;
         private readonly TestDbData TestData;
-        private readonly BookHelpers BookHelpers;
+        private BookHelpers BookHelpers;
 
         public BooksTests()
         {
@@ -44,7 +44,6 @@ namespace Bokulous_Back.Tests
             mailService = new BokulousMailService(mailSettings);
 
             UserHelpers = new(dbService);
-            BookHelpers = new(dbService);
             AdminController = new(dbService, mailService);
             UsersController = new(dbService, mailService);
             BooksController = new(dbService, mailService);
@@ -142,6 +141,16 @@ namespace Bokulous_Back.Tests
         }
 
         [Fact()]
+        public async void AddBookToStorageReturns200()
+        {
+            var book = TestData.Books.FirstOrDefault(x => x.Title == "TEST 4" && x.Seller.Username == "Sarah");
+            var response = await BooksController.AddBook(book);
+            var result = response as ObjectResult;
+            var obj = (Book)result.Value;
+            Assert.Equal(obj.InStorage, 5);
+        }
+
+        [Fact()]
         public async void AddBookWhereBookIsNullReturns400()
         {
             var book = new Book();
@@ -155,7 +164,7 @@ namespace Bokulous_Back.Tests
         public async void AddBookToCategoryWhereBookIsNullReturns400()
         {
             var category = TestData.Categories.FirstOrDefault(x => x.Name == "Skräck TEST");
-            var result = await BooksController.AddBookToCategory("222222222222222222222222", category);
+            var result = await BooksController.AddBookToCategory("", category);
             var statusCodeResult = result as StatusCodeResult;
             Assert.True(statusCodeResult.StatusCode == 400);
         }
