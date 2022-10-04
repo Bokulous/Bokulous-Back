@@ -54,22 +54,10 @@ public class BooksController : ControllerBase
         if (newBook is null)
             return BadRequest();
 
-        var books = await _bokulousDbService.GetBookAsync();
-        if (books is null || books.Count == 0)
-            return NotFound();
-
-        var book = books.FirstOrDefault(x => x.ISBN == newBook.ISBN && x.Seller.Username == newBook.Seller.Username);
-        if (book is null)
-        {
-            await _bokulousDbService.CreateBookAsync(newBook);
-            return CreatedAtAction(nameof(AddBook), new { id = newBook.Id }, newBook);
-        }
-        else
-        {
-            book.InStorage++;
-            await _bokulousDbService.UpdateBookAsync(book.Id, book);
-            return Ok(book);
-        }
+        await _bokulousDbService.CreateBookAsync(newBook);
+        return CreatedAtAction(nameof(AddBook), new { id = newBook.Id }, newBook);
+       
+        
     }
 
     [HttpPut("UpdateBook/{id:length(24)}")]
@@ -130,7 +118,6 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
 
-    //behöver den verkligen ta emot ett Category-objekt? Räcker det inte med en string på namnet på kategorin man vill skapa?
     [HttpGet("AddCategory")]
     public async Task<ActionResult> AddCategory(string category)
     {
@@ -153,7 +140,6 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
-    //Category object eller bara id? 
     [HttpPut("UpdateCategory")]
     public async Task<IActionResult> UpdateCategory(Category category, string newName)
     {
@@ -297,31 +283,6 @@ public class BooksController : ControllerBase
 
         return Ok(books);
     }
-
-
-    //public async Task<ActionResult<Image>> LoadImage(string id)
-    //{
-    //    var book = await _bokulousDbService.GetBookAsync(id);
-
-    //    if (book is null)
-    //    {
-    //        return NotFound();
-    //    }
-    //    if (book.BookCover == null || book.BookCover.Length == 0)
-    //    {
-    //        return NotFound("Bild saknas");
-    //    }
-
-    //    Image img;
-    //    using (MemoryStream ms = new MemoryStream(book.BookCover))
-    //    {
-    //        img = Image.FromStream(ms);
-    //        //return img;
-    //    }
-
-    //    return img;     
-    //}
-
     [HttpGet("GetBooksFiltered")]
     public async Task<ActionResult<List<Book>>> GetBookByAdvancedFilter(string? title = null, string? author = null, string? category = null, string? language = null, int? priceMin = null, int? priceMax = null, int? yearMin = null, int? yearMax = null)
     {

@@ -310,6 +310,14 @@ namespace Bokulous_Back.Tests
             Assert.Equal(expected, actual);
         }
 
+        [Fact()]
+        public async void GetBooksAdminReturns200()
+        {
+            var result = await AdminController.GetBooksAdmin();
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
         public void Dispose()
         {
             TestData.RemoveDataFromDb();
