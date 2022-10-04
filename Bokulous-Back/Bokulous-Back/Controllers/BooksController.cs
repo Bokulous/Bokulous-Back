@@ -295,50 +295,35 @@ public class BooksController : ControllerBase
 
         return Ok(books);
     }
-        }
+    [HttpGet("GetBooksFiltered")]
+    public async Task<ActionResult<List<Book>>> GetBookByAdvancedFilter(string? title = null, string? author = null, string? category = null, string? language = null, int? priceMin = null, int? priceMax = null, int? yearMin = null, int? yearMax = null)
+    {
+        var result = await _bokulousDbService.GetBookAsync();
 
-        if (priceMax is not null)
+
+        if (language is not null)
         {
-            result = result.Where(x => x.Price <= priceMax).ToList();
+            result = result.Where(x => x.Language.Contains(language)).ToList();
         }
 
-        if (yearMin is not null)
+        if (category is not null)
         {
-            result = result.Where(x => x.Published >= yearMin).ToList();
+            result = result.Where(x => x.Categories.Contains(category)).ToList();
         }
 
-        if (yearMax is not null)
+        if (title is not null)
         {
-            result = result.Where(x => x.Published <= yearMax).ToList();
+            result = result.Where(x => x.Title.Contains(title)).ToList();
         }
 
-        if (result is null)
-            return NotFound("No books found");
-
-        return Ok(result);
-    }
-        }
-
-        if (priceMax is not null)
+        if (author is not null)
         {
-            result = result.Where(x => x.Price <= priceMax).ToList();
+            result = result.Where(x => x.Authors.Contains(author)).ToList();
         }
 
-        if (yearMin is not null)
+        if (priceMin is not null)
         {
-            result = result.Where(x => x.Published >= yearMin).ToList();
-        }
-
-        if (yearMax is not null)
-        {
-            result = result.Where(x => x.Published <= yearMax).ToList();
-        }
-
-        if (result is null)
-            return NotFound("No books found");
-
-        return Ok(result);
-    }
+            result = result.Where(x => x.Price >= priceMin).ToList();
         }
 
         if (priceMax is not null)

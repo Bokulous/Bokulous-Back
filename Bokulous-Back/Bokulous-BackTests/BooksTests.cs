@@ -281,16 +281,6 @@ namespace Bokulous_Back.Tests
         }
 
         [Theory]
-        [InlineData("", "C:\\Users\\Desktop\\image.jpg", StatusCodes.Status404NotFound)]
-        [InlineData("123456789012345678901234", "", StatusCodes.Status404NotFound)]
-        public async void UploadImageWithNoIdOrUserIsNullReturnsStatusCode404(string id, string imagePath, int expectedResult)
-        {
-            var actionResult = await BooksController.UploadImage(id, imagePath);
-            var statusCodeResult = (IStatusCodeActionResult)actionResult;
-            Assert.Equal(expectedResult, statusCodeResult.StatusCode);
-        }
-
-        [Theory]
         [InlineData("", StatusCodes.Status404NotFound)]
         [InlineData(null, StatusCodes.Status404NotFound)]
         public async void GetCategoriesByKeywordWhereKeywordIsNullOrEmptyReturnsStatusCode404(string keyword, int expectedResult)
