@@ -79,7 +79,6 @@ namespace Bokulous_BackTests.Data
                 {
                     Username = "Sarah"
                 },
-                BookCover = default
             });
 
             Books.Add(new Book()
@@ -98,7 +97,6 @@ namespace Bokulous_BackTests.Data
                 {
                     Username = "Sarah"
                 },
-                BookCover = default
             });
 
             Books.Add(new Book()
@@ -117,7 +115,6 @@ namespace Bokulous_BackTests.Data
                 {
                     Username = "Sarah"
                 },
-                BookCover = default
             });
 
             Books.Add(new Book()
@@ -136,7 +133,6 @@ namespace Bokulous_BackTests.Data
                 {
                     Username = "Sarah"
                 },
-                BookCover = default
             });
         }
 
