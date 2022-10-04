@@ -13,6 +13,7 @@ namespace Bokulous_Back.Controllers
         private IBokulousMailService _bokulousMailService;
         private UserHelpers userHelper;
 
+        Random rnd = new Random();
         public UsersController(IBokulousDbService bokulousDbService, IBokulousMailService bokulousMailService)
         {
             _bokulousDbService = bokulousDbService;
@@ -48,6 +49,9 @@ namespace Bokulous_Back.Controllers
         [HttpPost("AddUser")]
         public async Task<IActionResult> AddUser(User newUser)
         {
+            const string ADDRESS = "https://localhost:7204/api";
+
+
             if (newUser is null)
                 return BadRequest();
 
@@ -67,8 +71,11 @@ namespace Bokulous_Back.Controllers
             if (!userHelper.CheckIsPasswordValid(newUser.Password))
                 return BadRequest("Password is not valid");
 
-            await _bokulousDbService.CreateUserAsync(newUser);
+            string code = rnd.Next(100000, 999999).ToString();
+            newUser.ActivationCode = code;
 
+            await _bokulousDbService.CreateUserAsync(newUser);
+            _bokulousMailService.SendEmail(newUser.Mail, "Welcome to Bokulous", "Welcome to Bokulous, " + newUser.Username + "! Verify your account here: <a href='" + ADDRESS + "/ActivateAccount/" + newUser.Id + "/" + newUser.ActivationCode + "'>here</a>");
             return Ok();
         }
 
@@ -152,6 +159,62 @@ namespace Bokulous_Back.Controllers
             }
 
             return Forbid("Wrong password");
+        }
+        
+        [HttpPost("ForgotPassword")]
+        public async Task<ActionResult> ForgotPassword(string mail)
+        {
+            var currentUser = await _bokulousDbService.GetUserMailAsync(mail);
+
+            if (currentUser != null)
+            {
+                var newPassword = rnd.Next(100, 1000).ToString();
+                currentUser.Password = newPassword;
+                await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
+                _bokulousMailService.SendEmail(mail, "New password", $"Your new password is: {newPassword}");
+                return Ok(currentUser);
+            }
+
+            return NotFound("Mail does not exist");
+        }
+
+        [HttpPost("ForgotUsername")]
+        public async Task<ActionResult> ForgotUsername(string mail)
+        {
+            var currentUser = await _bokulousDbService.GetUserMailAsync(mail);
+
+            if (currentUser != null)
+            {
+                var newUsername = "newusername" + rnd.Next(100, 1000).ToString();
+                currentUser.Username = newUsername;
+                await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
+                _bokulousMailService.SendEmail(mail, "New username", "Your new username is: " + newUsername);
+                return Ok(currentUser);
+            }
+
+            return NotFound("Mail does not exist");
+        }
+
+        [HttpGet("ActivateAccount/{id}/{code}")]
+        public async Task<ActionResult> ActivateAccount(string id, string code)
+        {
+            var user = await _bokulousDbService.GetUserAsync(id);
+
+            if (user is null)
+                return NotFound();
+
+            if (user.ActivationCode == code)
+            {
+                user.IsActive = true;
+                await _bokulousDbService.UpdateUserAsync(user.Id, user);
+                return Ok();
+            }
+            else
+            {
+                return Forbid("Wrong code");
+            }
+
+            return BadRequest();
         }
     }
 }

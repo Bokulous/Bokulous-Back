@@ -20,5 +20,6 @@ namespace Bokulous_Back.Services
         Task UpdateBookAsync(string id, Book updatedBook);
         Task UpdateCategoryAsync(string id, Category updatedCategory);
         Task UpdateUserAsync(string id, User updatedUser);
+        Task<User?> GetUserMailAsync(string mail);
     }
 }
