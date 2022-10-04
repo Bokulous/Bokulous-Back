@@ -36,7 +36,7 @@ namespace Bokulous_Back.Tests
                 .Build();
 
             IOptions<BokulousDatabaseSettings> databaseSettings = Options.Create(configuration.GetSection("BokulousDatabase").Get<BokulousDatabaseSettings>());
-            IOptions<BokulousMailSettings> mailSettings = Options.Create(configuration.GetSection("BokulousMailSettings").Get<BokulousMailSettings>());
+            IOptions<BokulousMailSettings> mailSettings = Options.Create(new BokulousMailSettings());
 
             dbService = new BokulousDbService(databaseSettings);
             mailService = new BokulousMailService(mailSettings);
@@ -58,7 +58,7 @@ namespace Bokulous_Back.Tests
 
             var expected = true;
 
-            var actual = UserHelpers.CheckIsAdmin(user.Id, user.Password).Result;
+            var actual = await UserHelpers.CheckIsAdmin(user.Id, user.Password);
 
             Assert.Equal(expected, actual);
         }
