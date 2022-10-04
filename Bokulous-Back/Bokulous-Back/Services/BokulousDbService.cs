@@ -74,7 +74,7 @@ namespace Bokulous_Back.Services
 
         //Login
         public async Task<User> LoginAsync(User userLogin) =>
-            await usersCollection.Find(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password).FirstOrDefaultAsync();
+            await usersCollection.Find(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password && userLogin.IsActive).FirstOrDefaultAsync();
 
         public async Task<User?> GetUserMailAsync(string mail) =>
            await usersCollection.Find(x => x.Mail == mail).FirstOrDefaultAsync();
