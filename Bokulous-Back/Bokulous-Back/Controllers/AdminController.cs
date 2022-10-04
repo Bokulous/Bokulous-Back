@@ -21,6 +21,16 @@ namespace Bokulous_Back.Controllers
             UserHelpers = new(_bokulousDbService);
         }
 
+        [HttpGet("GetBooksAdmin")]
+        public async Task<ActionResult<List<Book>>> GetBooksAdmin()
+        {
+            var books = await _bokulousDbService.GetBookAsync();
+            if (books is null)
+                return NotFound();
+
+            return Ok(books);
+        }
+
         [HttpPut("InactivateUser")]
         public async Task<ActionResult> InactivateUser(string userId, string adminId, string adminPassword)
         {

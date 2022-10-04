@@ -130,7 +130,6 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
 
-    //behöver den verkligen ta emot ett Category-objekt? Räcker det inte med en string på namnet på kategorin man vill skapa?
     [HttpGet("AddCategory")]
     public async Task<ActionResult> AddCategory(string category)
     {
@@ -153,7 +152,6 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
-    //Category object eller bara id? 
     [HttpPut("UpdateCategory")]
     public async Task<IActionResult> UpdateCategory(Category category, string newName)
     {
@@ -297,50 +295,4 @@ public class BooksController : ControllerBase
 
         return Ok(books);
     }
-
-    [HttpPut("UploadImage")]
-    public async Task<IActionResult> UploadImage(string id, string imagePath)
-    {
-        if (string.IsNullOrEmpty(id))
-        {
-            return NotFound();
-        }
-        var book = await _bokulousDbService.GetBookAsync(id);
-
-        if (book is null)
-        {
-            return NotFound();
-        }
-
-        if (!string.IsNullOrEmpty(imagePath))
-        {
-            book.BookCover = System.IO.File.ReadAllBytes(imagePath);
-            await _bokulousDbService.UpdateBookAsync(id, book);
-        }
-
-        return Ok();
-    }
-
-    //public async Task<ActionResult<Image>> LoadImage(string id)
-    //{
-    //    var book = await _bokulousDbService.GetBookAsync(id);
-
-    //    if (book is null)
-    //    {
-    //        return NotFound();
-    //    }
-    //    if (book.BookCover == null || book.BookCover.Length == 0)
-    //    {
-    //        return NotFound("Bild saknas");
-    //    }
-
-    //    Image img;
-    //    using (MemoryStream ms = new MemoryStream(book.BookCover))
-    //    {
-    //        img = Image.FromStream(ms);
-    //        //return img;
-    //    }
-
-    //    return img;     
-    //}
 }

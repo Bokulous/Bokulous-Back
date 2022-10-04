@@ -20,6 +20,5 @@
         public int InStorage { get; set; }
         public double Price { get; set; }
         public BookUser? Seller { get; set; }
-        public byte[] BookCover { get; set; }
     }
 }
