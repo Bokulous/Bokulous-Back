@@ -38,7 +38,7 @@ namespace Bokulous_Back.Tests
                 .Build();
 
             IOptions<BokulousDatabaseSettings> databaseSettings = Options.Create(configuration.GetSection("BokulousDatabase").Get<BokulousDatabaseSettings>());
-            IOptions<BokulousMailSettings> mailSettings = Options.Create(configuration.GetSection("BokulousMailSettings").Get<BokulousMailSettings>());
+            IOptions<BokulousMailSettings> mailSettings = Options.Create(new BokulousMailSettings());
 
             dbService = new BokulousDbService(databaseSettings);
             mailService = new BokulousMailService(mailSettings);

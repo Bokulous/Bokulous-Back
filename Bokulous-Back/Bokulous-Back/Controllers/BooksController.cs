@@ -54,22 +54,10 @@ public class BooksController : ControllerBase
         if (newBook is null)
             return BadRequest();
 
-        var books = await _bokulousDbService.GetBookAsync();
-        if (books is null || books.Count == 0)
-            return NotFound();
-
-        var book = books.FirstOrDefault(x => x.ISBN == newBook.ISBN && x.Seller.Username == newBook.Seller.Username);
-        if (book is null)
-        {
-            await _bokulousDbService.CreateBookAsync(newBook);
-            return CreatedAtAction(nameof(AddBook), new { id = newBook.Id }, newBook);
-        }
-        else
-        {
-            book.InStorage++;
-            await _bokulousDbService.UpdateBookAsync(book.Id, book);
-            return Ok(book);
-        }
+        await _bokulousDbService.CreateBookAsync(newBook);
+        return CreatedAtAction(nameof(AddBook), new { id = newBook.Id }, newBook);
+       
+        
     }
 
     [HttpPut("UpdateBook/{id:length(24)}")]

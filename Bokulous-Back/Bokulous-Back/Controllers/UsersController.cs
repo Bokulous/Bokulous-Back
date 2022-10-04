@@ -171,7 +171,7 @@ namespace Bokulous_Back.Controllers
 
             if (currentUser != null)
             {
-                var newUsername = "newusername" + rnd.Next(100, 1000).ToString();
+                var newUsername = "TEST_newusername" + rnd.Next(100, 1000).ToString();
                 currentUser.Username = newUsername;
                 await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
                 _bokulousMailService.SendEmail(mail, "New username", "Your new username is: " + newUsername);
