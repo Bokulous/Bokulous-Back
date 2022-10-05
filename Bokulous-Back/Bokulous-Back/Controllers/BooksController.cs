@@ -56,8 +56,7 @@ public class BooksController : ControllerBase
 
         await _bokulousDbService.CreateBookAsync(newBook);
         return CreatedAtAction(nameof(AddBook), new { id = newBook.Id }, newBook);
-       
-        
+            
     }
 
     [HttpPut("UpdateBook/{id:length(24)}")]
@@ -102,6 +101,12 @@ public class BooksController : ControllerBase
     [HttpPut("AddBookToCategory")]
     public async Task<ActionResult> AddBookToCategory(string bookId, Category category)
     {
+        if (string.IsNullOrEmpty(bookId))
+            return BadRequest();
+
+        if (category is null)
+            return BadRequest();
+
         var books = await _bokulousDbService.GetBookAsync(bookId);
 
         if (books is null)
@@ -118,7 +123,7 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
 
-    [HttpGet("AddCategory")]
+    [HttpPost("AddCategory/{category}")]
     public async Task<ActionResult> AddCategory(string category)
     {
         if (string.IsNullOrEmpty(category))
@@ -140,7 +145,7 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("UpdateCategory")]
+    [HttpPut("UpdateCategory/{newName}")]
     public async Task<IActionResult> UpdateCategory(Category category, string newName)
     {
         if (category is null || string.IsNullOrEmpty(newName))
