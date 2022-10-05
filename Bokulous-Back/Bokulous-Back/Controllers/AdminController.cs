@@ -79,7 +79,7 @@ namespace Bokulous_Back.Controllers
             return Ok();
         }
 
-        [HttpDelete("PurgeBook")]
+        [HttpDelete("PurgeBook/{bookId}/{adminId}/{password}")]
         public async Task<ActionResult> PurgeBook(string bookId, string adminId, string password)
         {
             var admin = await _bokulousDbService.GetUserAsync(adminId);

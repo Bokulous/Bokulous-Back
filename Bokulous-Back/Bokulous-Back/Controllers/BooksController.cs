@@ -123,7 +123,7 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
 
-    [HttpGet("AddCategory")]
+    [HttpPost("AddCategory/{category}")]
     public async Task<ActionResult> AddCategory(string category)
     {
         if (string.IsNullOrEmpty(category))
@@ -145,7 +145,7 @@ public class BooksController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("UpdateCategory")]
+    [HttpPut("UpdateCategory/{newName}")]
     public async Task<IActionResult> UpdateCategory(Category category, string newName)
     {
         if (category is null || string.IsNullOrEmpty(newName))
