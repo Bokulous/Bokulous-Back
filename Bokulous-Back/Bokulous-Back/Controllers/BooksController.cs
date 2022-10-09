@@ -34,7 +34,7 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
 
-    [HttpGet("GetBooksSeller/{id:length(24)}")]
+    [HttpGet("GetSellerBooks/{id:length(24)}")]
     public async Task<ActionResult<List<Book>>> GetSellerBooks(string id)
     {
         if(string.IsNullOrEmpty(id))
