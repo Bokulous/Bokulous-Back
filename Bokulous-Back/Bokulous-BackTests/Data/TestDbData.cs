@@ -77,6 +77,7 @@ namespace Bokulous_BackTests.Data
                 Price = 100,
                 Seller = new()
                 {
+                    Id = "333333",
                     Username = "Sarah"
                 },
             });
@@ -95,6 +96,7 @@ namespace Bokulous_BackTests.Data
                 Price = 100,
                 Seller = new()
                 {
+                    Id = "333333",
                     Username = "Sarah"
                 },
             });
@@ -113,6 +115,7 @@ namespace Bokulous_BackTests.Data
                 Price = 100,
                 Seller = new()
                 {
+                    Id = "333333",
                     Username = "Sarah"
                 },
             });
@@ -131,6 +134,7 @@ namespace Bokulous_BackTests.Data
                 Price = 100,
                 Seller = new()
                 {
+                    Id = "333333",
                     Username = "Sarah"
                 },
             });

@@ -427,6 +427,33 @@ namespace Bokulous_Back.Tests
             Assert.True(statusCodeResult.StatusCode == 400);
         }
 
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async void GetSellerBooksWhereIdIsNullReturns404(string id)
+        {
+            var result = await BooksController.GetSellerBooks(id);
+            var statusCodeResult = result.Result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 404);
+        }
+
+        [Fact()]
+        public async void GetSellerBooksWhereNoBooksReturns404()
+        {
+            var user = TestData.Users.FirstOrDefault(x => x.Username == "TEST_USER2");
+            var result = await BooksController.GetSellerBooks(user.Id);
+            var statusCodeResult = result.Result as StatusCodeResult;
+            Assert.True(statusCodeResult.StatusCode == 404);
+        }
+
+        [Fact()]
+        public async void GetSellerBooksReturns200()
+        {
+            var result = await BooksController.GetSellerBooks("333333");
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.True(statusCodeResult.StatusCode == 200);
+        }
+
         public void Dispose()
         {
             TestData.RemoveDataFromDb();
