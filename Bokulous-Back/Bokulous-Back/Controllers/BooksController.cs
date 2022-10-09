@@ -34,6 +34,25 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
 
+    [HttpGet("GetBooksSeller/{id:length(24)}")]
+    public async Task<ActionResult<List<Book>>> GetSellerBooks(string id)
+    {
+        if(string.IsNullOrEmpty(id))
+            return NotFound();
+
+        var allBooks = await _bokulousDbService.GetBookAsync();
+
+        if(allBooks.Count == 0 || allBooks is null)
+            return NotFound();
+
+        var books = allBooks.Where(x => x.Seller.Id == id).ToList();
+
+        if (books.Count == 0 || books is null)
+            return NotFound();
+
+        return Ok(books);
+    }
+
     [HttpGet("GetBook/{id:length(24)}")]
     public async Task<ActionResult<Book>> GetBook(string id)
     {
@@ -253,7 +272,7 @@ public class BooksController : ControllerBase
         return Ok(categories);
     }
 
-    [HttpGet("GetCategoriesByKeyword")]
+    [HttpGet("GetCategoriesByKeyword/{keyword}")]
     public async Task<ActionResult<List<Category>>> GetCategoriesByKeyword(string keyword)
     {
         if (string.IsNullOrEmpty(keyword))

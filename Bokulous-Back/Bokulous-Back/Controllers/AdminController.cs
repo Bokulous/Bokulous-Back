@@ -31,7 +31,7 @@ namespace Bokulous_Back.Controllers
             return Ok(books);
         }
 
-        [HttpPut("InactivateUser")]
+        [HttpPut("InactivateUser/{userId}/{adminId}/{adminPassword}")]
         public async Task<ActionResult> InactivateUser(string userId, string adminId, string adminPassword)
         {
             var user = await _bokulousDbService.GetUserAsync(userId);
@@ -58,7 +58,7 @@ namespace Bokulous_Back.Controllers
             return Ok();
         }
 
-        [HttpPut("ChangeUserPass")]
+        [HttpPut("ChangeUserPass/{userId}/{userNewPassword}/{adminId}/{adminPassword}")]
         public async Task<ActionResult> ChangeUserPass(string userId, string userNewPassword, string adminId, string adminPassword)
         {
             var user = await _bokulousDbService.GetUserAsync(userId);
@@ -163,7 +163,7 @@ namespace Bokulous_Back.Controllers
             return Ok();
         }
 
-        [HttpPost("ListUsers")]
+        [HttpGet("ListUsers/{adminId}/{password}")]
         public async Task<ActionResult<List<User>>> ListUsers(string adminId, string password)
         {
             var admin = await _bokulousDbService.GetUserAsync(adminId);
@@ -179,7 +179,7 @@ namespace Bokulous_Back.Controllers
             return Ok(users);
         }
 
-        [HttpPut("BlockUser")]
+        [HttpPut("BlockUser/{userId}/{adminId}/{password}")]
         public async Task<ActionResult> BlockUser(string userId, string adminId, string password)
         {
             var user = await _bokulousDbService.GetUserAsync(userId);
@@ -206,7 +206,7 @@ namespace Bokulous_Back.Controllers
             return Ok();
         }
 
-        [HttpPut("UnblockUser")]
+        [HttpPut("UnblockUser/{userId}/{adminId}/{password}")]
         public async Task<ActionResult> UnblockUser(string userId, string adminId, string password)
         {
             var user = await _bokulousDbService.GetUserAsync(userId);
@@ -233,7 +233,7 @@ namespace Bokulous_Back.Controllers
             return Ok();
         }
 
-        [HttpPut("Demote")]
+        [HttpPut("Demote/{userId}/{adminId}/{password}")]
         public async Task<ActionResult> Demote(string userId, string adminId, string password)
         {
             var user = await _bokulousDbService.GetUserAsync(userId);
@@ -260,7 +260,7 @@ namespace Bokulous_Back.Controllers
             return Ok();
         }
 
-        [HttpPut("Promote")]
+        [HttpPut("Promote/{userId}/{adminId}/{password}")]
         public async Task<ActionResult> Promote(string userId, string adminId, string password)
         {
             var user = await _bokulousDbService.GetUserAsync(userId);
@@ -313,7 +313,7 @@ namespace Bokulous_Back.Controllers
             return Ok(result.User);
         }
 
-        [HttpGet("FindUser")]
+        [HttpGet("FindUser/{keyword}/{adminId}/{adminPassword}")]
         public async Task<ActionResult<List<User>>> FindUser(string keyword, string adminId, string adminPassword)
         {
             if (!await UserHelpers.CheckIsAdmin(adminId, adminPassword))
