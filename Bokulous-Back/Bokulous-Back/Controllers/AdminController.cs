@@ -326,7 +326,7 @@ namespace Bokulous_Back.Controllers
             if (allUsers.Count == 0 || allUsers is null)
                 return NotFound("No users found");
 
-            var users = allUsers.Where(x => x.Username.Contains(keyword)).ToList();
+            var users = allUsers.Where(x => x.Username.ToLower().Contains(keyword.ToLower())).ToList();
 
             if (users.Count == 0 || users is null)
                 return NotFound("No user mathing the name found");
