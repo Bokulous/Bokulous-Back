@@ -206,7 +206,7 @@ namespace Bokulous_Back.Tests
             user.Mail = "updated@mail.com";
 
             //act
-            var response = UsersController.EditProfile(user.Id, user.Username, user.Mail, user.Password).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+            var response = UsersController.EditProfile(user).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
             var value = response.Value as User;
 
             //assert
@@ -218,7 +218,8 @@ namespace Bokulous_Back.Tests
         [InlineData("", "123456", StatusCodes.Status404NotFound)]
         public async void ChangePasswordWithEmptyOrNoIdReturnsStatusCode404(string id, string password, int expectedResult)
         {
-            var actionResult = await UsersController.ChangePassword(id, password);
+            var userinput = new User() { Id = id, Password = password };
+            var actionResult = await UsersController.ChangePassword(userinput);
             var statusCodeResult = (IStatusCodeActionResult)actionResult;
             Assert.Equal(expectedResult, statusCodeResult.StatusCode);
         }
@@ -227,7 +228,8 @@ namespace Bokulous_Back.Tests
         [InlineData("98374920347019273", "123", StatusCodes.Status400BadRequest)]
         public async void ChangePasswordWithInvalidPasswordReturnsStatusCode400(string id, string password, int expectedResult)
         {
-            var actionResult = await UsersController.ChangePassword(id, password);
+            var userinput = new User() { Id = id, Password = password };
+            var actionResult = await UsersController.ChangePassword(userinput);
             var statusCodeResult = (IStatusCodeActionResult)actionResult;
             Assert.Equal(expectedResult, statusCodeResult.StatusCode);
         }
@@ -237,8 +239,8 @@ namespace Bokulous_Back.Tests
         public async void ChangePasswordWhereUserIsNullReturnsStatusCode400(string password, int expectedResult)
         {
             var userDontExist = new User()
-            { Id = "111111111111111111111111"};
-            var actionResult = await UsersController.ChangePassword(userDontExist.Id, password);
+            { Id = "111111111111111111111111", Password = password };
+            var actionResult = await UsersController.ChangePassword(userDontExist);
             var statusCodeResult = (IStatusCodeActionResult)actionResult;
             Assert.Equal(expectedResult, statusCodeResult.StatusCode);
         }
