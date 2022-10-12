@@ -10,6 +10,7 @@ namespace Bokulous_BackTests.Data
         public List<User> Users { get; set; }
         public List<Book> Books { get; set; }
         public List<Category> Categories { get; set; }
+        public List<RequestForgotPassword> Mail { get; set; }
         public Book book { get; set; }
 
         public TestDbData(IBokulousDbService dbService)
@@ -19,9 +20,16 @@ namespace Bokulous_BackTests.Data
             Users = new();
             Books = new();
             Categories = new();
+            Mail = new();
 
         }
-
+        private void addMail()
+        {
+            Mail.Add(new RequestForgotPassword()
+            {
+                Mail = "bla1@bla.com"
+            });
+        }
         private void AddUsers()
         {
             Users.Add(new User()
@@ -165,6 +173,7 @@ namespace Bokulous_BackTests.Data
             AddUsers();
             AddBooks();
             AddCategories();
+            addMail();
 
             Users.ForEach(async (user) => await _dbService.CreateUserAsync(user));
             Books.ForEach(async (book) => await _dbService.CreateBookAsync(book));

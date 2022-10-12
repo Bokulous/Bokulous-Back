@@ -248,12 +248,12 @@ namespace Bokulous_Back.Tests
         public void ForgotPasswordTest()
         {
             //arrange
-            var user = TestData.Users.FirstOrDefault(x => x.Mail == "bla1@bla.com");
+            var user = TestData.Mail.FirstOrDefault(x => x.Mail == "bla1@bla.com");
 
             //var password = "newpassword123";
 
             //act
-            var response = UsersController.ForgotPassword(user.Mail).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+            var response = UsersController.ForgotPassword(user).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
             //var value = response.Value as User;
 
             //assert
@@ -265,10 +265,10 @@ namespace Bokulous_Back.Tests
         public void ForgotUsernameTest()
         {
             //arrange
-            var user = TestData.Users.FirstOrDefault(x => x.Mail == "bla1@bla.com");
+            var user = TestData.Mail.FirstOrDefault(x => x.Mail == "bla1@bla.com");
 
             //act
-            var response = UsersController.ForgotUsername(user.Mail).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
+            var response = UsersController.ForgotUsername(user).Result as Microsoft.AspNetCore.Mvc.ObjectResult;
 
             //assert
             Assert.True(response.StatusCode == 200);
