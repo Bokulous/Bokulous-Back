@@ -148,16 +148,16 @@ namespace Bokulous_Back.Controllers
         }
         
         [HttpPost("ForgotPassword")]
-        public async Task<ActionResult> ForgotPassword(string mail)
+        public async Task<ActionResult> ForgotPassword([FromBody]RequestForgotPassword data)
         {
-            var currentUser = await _bokulousDbService.GetUserMailAsync(mail);
+            var currentUser = await _bokulousDbService.GetUserMailAsync(data.Mail);
 
             if (currentUser != null)
             {
-                var newPassword = rnd.Next(100, 1000).ToString();
+                var newPassword = "newpassword" + rnd.Next(100, 1000).ToString();
                 currentUser.Password = newPassword;
                 await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
-                _bokulousMailService.SendEmail(mail, "New password", $"Your new password is: {newPassword}");
+                _bokulousMailService.SendEmail(data.Mail, "New password", $"Your new password is: {newPassword}");
                 return Ok(currentUser);
             }
 
@@ -165,16 +165,16 @@ namespace Bokulous_Back.Controllers
         }
 
         [HttpPost("ForgotUsername")]
-        public async Task<ActionResult> ForgotUsername(string mail)
+        public async Task<ActionResult> ForgotUsername([FromBody]RequestForgotPassword data)
         {
-            var currentUser = await _bokulousDbService.GetUserMailAsync(mail);
+            var currentUser = await _bokulousDbService.GetUserMailAsync(data.Mail);
 
             if (currentUser != null)
             {
-                var newUsername = "TEST_newusername" + rnd.Next(100, 1000).ToString();
+                var newUsername = "newusername" + rnd.Next(100, 1000).ToString();
                 currentUser.Username = newUsername;
                 await _bokulousDbService.UpdateUserAsync(currentUser.Id, currentUser);
-                _bokulousMailService.SendEmail(mail, "New username", "Your new username is: " + newUsername);
+                _bokulousMailService.SendEmail(data.Mail, "New username", "Your new username is: " + newUsername);
                 return Ok(currentUser);
             }
 
