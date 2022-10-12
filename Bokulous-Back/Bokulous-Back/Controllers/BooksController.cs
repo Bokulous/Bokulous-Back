@@ -282,7 +282,7 @@ public class BooksController : ControllerBase
         if (categories.Count == 0 || categories is null)
             return NotFound("No categories found");
 
-        var cat = categories.Where(x => x.Name.Contains(keyword)).ToList();
+        var cat = categories.Where(x => x.Name.ToLower().Contains(keyword.ToLower())).ToList();
 
         if (cat.Count == 0 || cat is null)
             return NotFound("No categories mathing the name found");

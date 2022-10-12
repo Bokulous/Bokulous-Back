@@ -76,28 +76,28 @@ namespace Bokulous_Back.Controllers
 
             await _bokulousDbService.CreateUserAsync(newUser);
             _bokulousMailService.SendEmail(newUser.Mail, "Welcome to Bokulous", "Welcome to Bokulous, " + newUser.Username + "! Verify your account here: <a href='" + ADDRESS + "/ActivateAccount/" + newUser.Id + "/" + newUser.ActivationCode + "'>here</a>");
-            return Ok();
+            return Ok(newUser);
         }
 
         [HttpPut("ChangePassword")]
-        public async Task<ActionResult> ChangePassword(string id, string newPassword)
+        public async Task<ActionResult> ChangePassword([FromBody] User userNewPassword)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(userNewPassword.Id))
             {
                 return NotFound("User not found");
             }
-            if (!userHelper.CheckIsPasswordValid(newPassword))
+            if (!userHelper.CheckIsPasswordValid(userNewPassword.Password))
             {
                 return BadRequest("Invalid password");
             }
 
-            var user = await _bokulousDbService.GetUserAsync(id);
+            var user = await _bokulousDbService.GetUserAsync(userNewPassword.Id);
             if (user is null)
             {
                 return NotFound("User not found");
             }
 
-            user.Password = newPassword;
+            user.Password = userNewPassword.Password;
             await _bokulousDbService.UpdateUserAsync(user.Id, user);
 
             return Ok();
@@ -130,14 +130,14 @@ namespace Bokulous_Back.Controllers
         }
 
         [HttpPost("EditProfile")]
-        public async Task<ActionResult> EditProfile(string id, string username, string email, string password)
+        public async Task<ActionResult> EditProfile([FromBody] User userEdit)
         {
-            var user = await _bokulousDbService.GetUserAsync(id);
+            var user = await _bokulousDbService.GetUserAsync(userEdit.Id);
 
-            if (user.Password == password)
+            if (user.Password == userEdit.Password)
             {
-                user.Username = username;
-                user.Mail = email;
+                user.Username = userEdit.Username;
+                user.Mail = userEdit.Mail;
 
                 await _bokulousDbService.UpdateUserAsync(user.Id, user);
 
@@ -146,7 +146,7 @@ namespace Bokulous_Back.Controllers
 
             return Forbid("Wrong password");
         }
-        
+
         [HttpPost("ForgotPassword")]
         public async Task<ActionResult> ForgotPassword([FromBody]RequestForgotPassword data)
         {
